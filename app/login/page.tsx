@@ -68,8 +68,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <div className="flex min-h-screen min-h-dvh items-center justify-center bg-background p-4 sm:p-6">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
             <HardHat className="h-5 w-5 text-primary-foreground" />

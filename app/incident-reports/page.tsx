@@ -70,7 +70,7 @@ export default function IncidentReportsPage() {
     <AuthGuard allowedRoles={["Admin", "Safety Inspector", "Contractor"]}>
       <DashboardLayout>
         <TopNavbar title="Incident Reports" />
-        <div className="space-y-6 p-6">
+        <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
           {/* Stats */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Card><CardContent className="flex items-center gap-3 p-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF6F00]/10"><AlertTriangle className="h-5 w-5 text-[#FF6F00]" /></div><div><p className="text-xl font-bold">{incidents.length}</p><p className="text-xs text-muted-foreground">Total Incidents</p></div></CardContent></Card>

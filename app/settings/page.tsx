@@ -36,7 +36,7 @@ export default function SettingsPage() {
     <AuthGuard>
       <DashboardLayout>
         <TopNavbar title="Settings" />
-        <div className="space-y-6 p-6">
+        <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
           {/* Profile Card */}
           <Card className="overflow-hidden border-border bg-card">
             <div className="h-24 bg-gradient-to-br from-[#1a2332] via-[#2C3E50] to-[#1a2332]" />

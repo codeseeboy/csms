@@ -72,9 +72,9 @@ export default function TrainingPage() {
     <AuthGuard allowedRoles={["Worker", "Contractor", "Admin", "Safety Inspector"]}>
       <DashboardLayout>
         <TopNavbar title="Training & Certifications" />
-        <div className="space-y-6 p-6">
+        <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
           {/* Summary Stats */}
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
             <Card className="border-border bg-card">
               <CardContent className="flex items-center gap-3 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#6366f1]/10">
@@ -179,21 +179,21 @@ export default function TrainingPage() {
 
           {/* Worker Training Status Table */}
           <Card className="border-border bg-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2C3E50]/10">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#2C3E50]/10">
                   <Award className="h-4 w-4 text-[#2C3E50]" />
                 </div>
-                <CardTitle className="text-sm font-semibold">Worker Training & Certification Status</CardTitle>
+                <CardTitle className="truncate text-sm font-semibold">Worker Training & Certification Status</CardTitle>
               </div>
-              <div className="relative">
+              <div className="relative w-full sm:w-auto">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search workers..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="h-9 w-48 rounded-lg border border-input bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]"
+                  className="h-9 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107] sm:w-48"
                 />
               </div>
             </CardHeader>

@@ -47,7 +47,7 @@ export default function SafetyUpdatesPage() {
     <AuthGuard allowedRoles={["Worker", "Admin", "Safety Inspector", "Contractor", "Government Authority"]}>
       <DashboardLayout>
         <TopNavbar title="Safety Updates" />
-        <div className="space-y-6 p-6">
+        <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
           {/* Summary */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Card className="border-border bg-card">

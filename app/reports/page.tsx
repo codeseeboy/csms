@@ -46,7 +46,7 @@ export default function ReportsPage() {
     <AuthGuard allowedRoles={["Admin", "Government Authority"]}>
       <DashboardLayout>
         <TopNavbar title="Compliance Reports" />
-        <div className="space-y-6 p-6">
+        <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
           <Card>
             <CardHeader>
               <CardTitle>Export Reports</CardTitle>

@@ -44,14 +44,14 @@ function DashboardContent() {
   const recentActivity = auditLogs.slice(0, 5)
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
       {/* Welcome Banner */}
-      <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a2332] via-[#2C3E50] to-[#1a2332] p-6 md:p-8 transition-all duration-700 ${mounted ? "animate-fade-in-up" : "opacity-0"}`}>
+      <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a2332] via-[#2C3E50] to-[#1a2332] p-4 sm:p-6 md:p-8 transition-all duration-700 ${mounted ? "animate-fade-in-up" : "opacity-0"}`}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, #FFC107 0%, transparent 50%)" }} />
-        <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="relative flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm text-white/50">{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
-            <h1 className="mt-1 text-2xl font-bold text-white md:text-3xl">
+            <h1 className="mt-1 text-xl font-bold text-white sm:text-2xl md:text-3xl">
               {getGreeting()}, {currentUser?.name?.split(" ")[0] ?? "there"}
             </h1>
             <p className="mt-2 text-sm text-white/60">
@@ -61,7 +61,7 @@ function DashboardContent() {
               }
             </p>
           </div>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-4 sm:gap-6">
             <div className="text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
                 <TrendingUp className="h-6 w-6 text-[#10b981]" />
@@ -81,7 +81,7 @@ function DashboardContent() {
       </div>
 
       {/* Quick Actions */}
-      <div className={`grid grid-cols-2 gap-3 md:grid-cols-4 transition-all duration-700 ${mounted ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
+      <div className={`grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 transition-all duration-700 ${mounted ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
         {quickActions.map((action) => (
           <Link key={action.label} href={action.href}>
             <Card className="hover-lift group cursor-pointer border-border bg-card transition-all hover:border-[#FFC107]/30 hover:shadow-lg hover:shadow-[#FFC107]/5">
@@ -110,7 +110,7 @@ function DashboardContent() {
       </section>
 
       {/* Panels + Activity Timeline */}
-      <div className={`grid grid-cols-1 gap-6 xl:grid-cols-3 transition-all duration-700 ${mounted ? "animate-fade-in-up delay-500" : "opacity-0"}`}>
+      <div className={`grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3 transition-all duration-700 ${mounted ? "animate-fade-in-up delay-500" : "opacity-0"}`}>
         <div className="xl:col-span-2">
           <CscmsDashboardPanels />
         </div>

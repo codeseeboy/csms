@@ -100,7 +100,7 @@ export default function RegisterPage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-3xl px-6 py-10">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
         {/* Header */}
         <div className="animate-fade-in-up text-center">
           <h1 className="text-3xl font-bold text-foreground">Create Your Account</h1>
@@ -190,7 +190,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <form className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm" onSubmit={onSubmit}>
+            <form className="space-y-4 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6" onSubmit={onSubmit}>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-foreground">Full Name</label>
                 <div className="relative">
