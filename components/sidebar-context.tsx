@@ -16,8 +16,14 @@ const MOBILE_BREAKPOINT = 1024
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isMobile, setIsMobile] = useState(false)
   const [isOpen, setIsOpen] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return
     const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     const handler = () => {
       const mobile = mq.matches
@@ -28,7 +34,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     handler()
     mq.addEventListener("change", handler)
     return () => mq.removeEventListener("change", handler)
-  }, [])
+  }, [mounted])
 
   const toggle = useCallback(() => setIsOpen((prev) => !prev), [])
   const close = useCallback(() => setIsOpen(false), [])

@@ -26,9 +26,9 @@ export function CscmsDashboardPanels() {
   const upcomingInspections = inspections.filter((i) => i.status === "Scheduled").slice(0, 3)
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
       {/* Recent Incidents */}
-      <Card className="border-border bg-card">
+      <Card className="min-w-0 border-border bg-card">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF6F00]/10">
@@ -48,21 +48,21 @@ export function CscmsDashboardPanels() {
               return (
                 <div
                   key={incident.id}
-                  className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 transition-all hover:border-border/60 hover:shadow-sm"
+                  className="group flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border bg-background p-3 transition-all hover:border-border/60 hover:shadow-sm sm:flex-nowrap sm:gap-3"
                 >
                   <div className={`relative h-2.5 w-2.5 shrink-0 rounded-full ${sev.dot}`}>
                     {incident.status === "Open" && (
                       <span className={`absolute inset-0 animate-ping rounded-full ${sev.dot} opacity-40`} />
                     )}
                   </div>
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 basis-full sm:basis-auto">
                     <p className="truncate text-sm font-medium text-foreground">{incident.title ?? incident.id}</p>
                     <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                       <MapPin className="h-3 w-3 shrink-0" />
                       <span className="truncate">{incident.location}</span>
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="flex shrink-0 flex-wrap items-center gap-1.5">
                     <Badge variant="outline" className={`text-[10px] ${sev.color}`}>{incident.severity}</Badge>
                     <Badge variant="outline" className={`text-[10px] ${stat.color}`}>{incident.status}</Badge>
                   </div>
@@ -81,7 +81,7 @@ export function CscmsDashboardPanels() {
       {/* Compliance & Inspections */}
       <div className="space-y-4">
         {/* Expiring Certs */}
-        <Card className="border-border bg-card">
+        <Card className="min-w-0 border-border bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626]/10">
@@ -124,7 +124,7 @@ export function CscmsDashboardPanels() {
         </Card>
 
         {/* Upcoming Inspections */}
-        <Card className="border-border bg-card">
+        <Card className="min-w-0 border-border bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#6366f1]/10">

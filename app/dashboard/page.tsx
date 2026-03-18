@@ -44,17 +44,17 @@ function DashboardContent() {
   const recentActivity = auditLogs.slice(0, 5)
 
   return (
-    <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
+    <div className="min-w-0 space-y-4 p-4 sm:space-y-6 sm:p-6">
       {/* Welcome Banner */}
       <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a2332] via-[#2C3E50] to-[#1a2332] p-4 sm:p-6 md:p-8 transition-all duration-700 ${mounted ? "animate-fade-in-up" : "opacity-0"}`}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, #FFC107 0%, transparent 50%)" }} />
         <div className="relative flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-sm text-white/50">{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
-            <h1 className="mt-1 text-xl font-bold text-white sm:text-2xl md:text-3xl">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm text-white/50">{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
+            <h1 className="mt-1 truncate text-xl font-bold text-white sm:text-2xl md:text-3xl">
               {getGreeting()}, {currentUser?.name?.split(" ")[0] ?? "there"}
             </h1>
-            <p className="mt-2 text-sm text-white/60">
+            <p className="mt-2 line-clamp-2 text-sm text-white/60">
               {openIncidents > 0
                 ? `You have ${openIncidents} open incident${openIncidents !== 1 ? "s" : ""} and ${activeInspections} scheduled inspection${activeInspections !== 1 ? "s" : ""} to review.`
                 : `All clear — ${activeInspections} inspection${activeInspections !== 1 ? "s" : ""} scheduled. Compliance at ${complianceRate}%.`

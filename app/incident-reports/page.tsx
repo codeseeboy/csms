@@ -72,7 +72,7 @@ export default function IncidentReportsPage() {
         <TopNavbar title="Incident Reports" />
         <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
           {/* Stats */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3">
             <Card><CardContent className="flex items-center gap-3 p-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF6F00]/10"><AlertTriangle className="h-5 w-5 text-[#FF6F00]" /></div><div><p className="text-xl font-bold">{incidents.length}</p><p className="text-xs text-muted-foreground">Total Incidents</p></div></CardContent></Card>
             <Card><CardContent className="flex items-center gap-3 p-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#dc2626]/10"><ShieldAlert className="h-5 w-5 text-[#dc2626]" /></div><div><p className="text-xl font-bold">{openCount}</p><p className="text-xs text-muted-foreground">Open</p></div></CardContent></Card>
             <Card><CardContent className="flex items-center gap-3 p-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFC107]/10"><Clock className="h-5 w-5 text-[#FFC107]" /></div><div><p className="text-xl font-bold">{reviewCount}</p><p className="text-xs text-muted-foreground">Under Review</p></div></CardContent></Card>
@@ -154,16 +154,18 @@ export default function IncidentReportsPage() {
               <div className="space-y-2">
                 {incidents.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No incidents reported yet.</p>}
                 {incidents.slice(0, 8).map((inc) => (
-                  <div key={inc.id} className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 transition-all hover:shadow-sm">
-                    <div className="min-w-0 flex-1">
+                  <div key={inc.id} className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border bg-background p-3 transition-all hover:shadow-sm sm:gap-3">
+                    <div className="min-w-0 flex-1 basis-full sm:basis-auto">
                       <p className="truncate text-sm font-medium text-foreground">{inc.title || inc.id}</p>
                       <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{inc.location}</span>
                         <span>&middot;</span> <span>{inc.date}</span>
                       </div>
                     </div>
-                    <Badge variant="outline" className={`shrink-0 text-[10px] ${severityColor(inc.severity)}`}>{inc.severity}</Badge>
-                    <Badge variant="outline" className={`shrink-0 text-[10px] ${statusColor(inc.status)}`}>{inc.status}</Badge>
+                    <div className="flex shrink-0 flex-wrap gap-1.5">
+                      <Badge variant="outline" className={`text-[10px] ${severityColor(inc.severity)}`}>{inc.severity}</Badge>
+                      <Badge variant="outline" className={`text-[10px] ${statusColor(inc.status)}`}>{inc.status}</Badge>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -165,14 +165,14 @@ export function CscmsKpiCards() {
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
+    <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
       {items.map((item, i) => (
         <Card
           key={item.label}
-          className="hover-lift group cursor-default border-border bg-card transition-all hover:border-border/60 hover:shadow-lg"
+          className="hover-lift group min-w-0 cursor-default border-border bg-card transition-all hover:border-border/60 hover:shadow-lg"
           style={{ animationDelay: `${i * 80}ms` }}
         >
-          <CardContent className="p-5">
+          <CardContent className="min-w-0 p-5">
             <div className="flex items-start justify-between">
               <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${item.bg} transition-transform group-hover:scale-110`}>
                 <item.icon className="h-5 w-5" style={{ color: item.color }} />

@@ -181,7 +181,7 @@ export function WorkerTable({ onOpenModal }: WorkerTableProps) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="h-9 w-[160px] border-input bg-background text-foreground">
+            <SelectTrigger className="h-9 min-w-0 w-full border-input bg-background text-foreground sm:w-[160px]">
               <SelectValue placeholder="Filter by Role" />
             </SelectTrigger>
             <SelectContent>
@@ -194,7 +194,7 @@ export function WorkerTable({ onOpenModal }: WorkerTableProps) {
             </SelectContent>
           </Select>
           <Select value={certFilter} onValueChange={setCertFilter}>
-            <SelectTrigger className="h-9 w-[160px] border-input bg-background text-foreground">
+            <SelectTrigger className="h-9 min-w-0 w-full border-input bg-background text-foreground sm:w-[160px]">
               <SelectValue placeholder="Cert Status" />
             </SelectTrigger>
             <SelectContent>
