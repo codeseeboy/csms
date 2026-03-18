@@ -114,7 +114,7 @@ export function DashboardCharts() {
   const totalIncidents = monthlyIncidents.reduce((sum, m) => sum + m.incidents, 0)
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
       {/* Incidents Bar + Area overlay */}
       <ChartCard title="Monthly Incidents" icon={BarChart3} iconColor="#FF6F00" badge={`${totalIncidents} total`}>
         <ResponsiveContainer width="100%" height={260}>

@@ -158,10 +158,10 @@ function StatCard({ label, end, suffix }: { label: string; end: number; suffix: 
   const { value, ref } = useCountUp(end)
   return (
     <div ref={ref} className="text-center">
-      <p className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">
+      <p className="text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">
         {value.toLocaleString()}{suffix}
       </p>
-      <p className="mt-2 text-sm text-white/70">{label}</p>
+      <p className="mt-1 text-xs text-white/70 sm:mt-2 sm:text-sm">{label}</p>
     </div>
   )
 }
@@ -201,23 +201,23 @@ export default function HomePage() {
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* ───── Navbar ───── */}
       <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FFC107]">
+        <div className="mx-auto flex h-14 min-h-[3.5rem] max-w-7xl items-center justify-between gap-2 px-4 sm:h-16 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FFC107]">
               <HardHat className="h-5 w-5 text-[#1a1a2e]" />
             </div>
-            <span className="text-lg font-bold text-foreground tracking-tight">CSCMS</span>
+            <span className="truncate text-base font-bold text-foreground tracking-tight sm:text-lg">CSCMS</span>
           </div>
-          <div className="hidden items-center gap-8 md:flex">
+          <div className="hidden items-center gap-6 md:flex">
             <a href="#features" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Features</a>
             <a href="#roles" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Roles</a>
             <a href="#testimonials" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Testimonials</a>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted active:bg-muted sm:px-4">
               Sign In
             </Link>
-            <Link href="/register" className="rounded-lg bg-[#FFC107] px-4 py-2 text-sm font-semibold text-[#1a1a2e] transition-all hover:bg-[#ffca2c] hover:shadow-lg hover:shadow-[#FFC107]/25">
+            <Link href="/register" className="rounded-lg bg-[#FFC107] px-3 py-2 text-sm font-semibold text-[#1a1a2e] transition-all hover:bg-[#ffca2c] active:opacity-90 sm:px-4">
               Get Started
             </Link>
           </div>
@@ -245,28 +245,28 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-6 py-24 md:py-32 lg:py-40">
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 md:py-32 lg:py-40">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="animate-fade-in-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
+            <div className="animate-fade-in-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/80 backdrop-blur-sm sm:px-4 sm:text-sm">
               <span className="flex h-2 w-2 rounded-full bg-[#10b981]">
                 <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-[#10b981] opacity-60" />
               </span>
               Construction Safety Compliance Platform
             </div>
 
-            <h1 className="animate-fade-in-up delay-200 mt-8 text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+            <h1 className="animate-fade-in-up delay-200 mt-6 text-3xl font-extrabold leading-tight tracking-tight text-white sm:mt-8 sm:text-4xl md:text-5xl lg:text-6xl">
               Build Safer.{" "}
               <span className="bg-gradient-to-r from-[#FFC107] to-[#FF6F00] bg-clip-text text-transparent">
                 Stay Compliant.
               </span>
             </h1>
 
-            <p className="animate-fade-in-up delay-400 mt-6 text-lg text-white/60 md:text-xl">
+            <p className="animate-fade-in-up delay-400 mt-4 text-base text-white/60 sm:mt-6 sm:text-lg md:text-xl">
               Digitize safety checklists, report incidents with evidence, track certifications,
               and generate audit-ready compliance reports — all from one platform.
             </p>
 
-            <div className="animate-fade-in-up delay-600 mt-10 flex flex-wrap items-center justify-center gap-4">
+            <div className="animate-fade-in-up delay-600 mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10 sm:gap-4">
               <Link
                 href="/register"
                 className="group flex items-center gap-2 rounded-xl bg-[#FFC107] px-6 py-3 text-sm font-bold text-[#1a1a2e] transition-all hover:bg-[#ffca2c] hover:shadow-xl hover:shadow-[#FFC107]/30"
@@ -282,7 +282,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="animate-fade-in-up delay-800 mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/50">
+            <div className="animate-fade-in-up delay-800 mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-white/50 sm:mt-8 sm:gap-6 sm:text-sm">
               <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-[#10b981]" /> No credit card required</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-[#10b981]" /> 5 roles supported</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-[#10b981]" /> Audit-ready exports</span>
@@ -299,8 +299,8 @@ export default function HomePage() {
       </section>
 
       {/* ───── Stats ───── */}
-      <section className="relative -mt-1 bg-[#1a2332] py-16">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-6 md:grid-cols-4">
+      <section className="relative -mt-1 bg-[#1a2332] py-10 sm:py-16">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 md:gap-8">
           {stats.map((s) => (
             <StatCard key={s.label} {...s} />
           ))}
@@ -308,17 +308,17 @@ export default function HomePage() {
       </section>
 
       {/* ───── Features ───── */}
-      <section id="features" className="py-24 md:py-32">
-        <div className="mx-auto max-w-7xl px-6">
+      <section id="features" className="py-16 sm:py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div ref={features1.ref} className={`mx-auto max-w-2xl text-center transition-all duration-700 ${features1.visible ? "animate-fade-in-up" : "opacity-0"}`}>
             <p className="text-sm font-semibold uppercase tracking-wider text-[#FFC107]">Features</p>
-            <h2 className="mt-3 text-3xl font-bold text-foreground md:text-4xl">Everything You Need for Construction Safety</h2>
+            <h2 className="mt-3 text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">Everything You Need for Construction Safety</h2>
             <p className="mt-4 text-muted-foreground">Comprehensive tools designed for the construction industry's unique safety and compliance requirements.</p>
           </div>
 
-          <div ref={features2.ref} className="mt-16">
+          <div ref={features2.ref} className="mt-10 sm:mt-16">
             {/* Feature selector tabs */}
-            <div className="mx-auto mb-12 flex max-w-4xl flex-wrap justify-center gap-2">
+            <div className="mx-auto mb-8 flex max-w-4xl flex-wrap justify-center gap-1.5 sm:mb-12 sm:gap-2">
               {features.map((f, i) => (
                 <button
                   key={f.title}
@@ -339,7 +339,7 @@ export default function HomePage() {
             <div className="mx-auto max-w-4xl">
               <div
                 key={activeFeature}
-                className="animate-scale-in flex flex-col items-center gap-8 rounded-3xl border border-border bg-card p-8 shadow-xl md:flex-row md:p-12"
+                className="animate-scale-in flex flex-col items-center gap-6 rounded-2xl border border-border bg-card p-6 shadow-xl sm:gap-8 sm:rounded-3xl sm:p-8 md:flex-row md:p-12"
               >
                 <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: `${features[activeFeature].color}15` }}>
                   {(() => { const Icon = features[activeFeature].icon; return <Icon className="h-12 w-12" style={{ color: features[activeFeature].color }} /> })()}
@@ -355,7 +355,7 @@ export default function HomePage() {
             </div>
 
             {/* Feature grid cards */}
-            <div className={`mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 transition-all duration-700 ${features2.visible ? "" : "opacity-0 translate-y-8"}`}>
+            <div className={`mt-8 grid grid-cols-1 gap-3 sm:mt-12 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 transition-all duration-700 ${features2.visible ? "" : "opacity-0 translate-y-8"}`}>
               {features.map((f, i) => (
                 <button
                   key={f.title}
@@ -379,15 +379,15 @@ export default function HomePage() {
       </section>
 
       {/* ───── Roles ───── */}
-      <section id="roles" className="bg-muted/30 py-24 md:py-32">
-        <div className="mx-auto max-w-7xl px-6">
+      <section id="roles" className="bg-muted/30 py-16 sm:py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div ref={rolesSection.ref} className={`mx-auto max-w-2xl text-center transition-all duration-700 ${rolesSection.visible ? "animate-fade-in-up" : "opacity-0"}`}>
             <p className="text-sm font-semibold uppercase tracking-wider text-[#FF6F00]">Role-Based Access</p>
-            <h2 className="mt-3 text-3xl font-bold text-foreground md:text-4xl">Tailored for Every Stakeholder</h2>
+            <h2 className="mt-3 text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">Tailored for Every Stakeholder</h2>
             <p className="mt-4 text-muted-foreground">Five distinct roles with purpose-built dashboards, permissions, and workflows.</p>
           </div>
 
-          <div className={`mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 transition-all duration-700 ${rolesSection.visible ? "" : "opacity-0 translate-y-8"}`}>
+          <div className={`mt-10 grid grid-cols-1 gap-4 sm:mt-16 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 transition-all duration-700 ${rolesSection.visible ? "" : "opacity-0 translate-y-8"}`}>
             {roles.map((role, i) => (
               <div
                 key={role.title}
@@ -408,14 +408,14 @@ export default function HomePage() {
       </section>
 
       {/* ───── Testimonials ───── */}
-      <section id="testimonials" className="py-24 md:py-32">
-        <div className="mx-auto max-w-7xl px-6">
+      <section id="testimonials" className="py-16 sm:py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div ref={testimonialsSection.ref} className={`mx-auto max-w-2xl text-center transition-all duration-700 ${testimonialsSection.visible ? "animate-fade-in-up" : "opacity-0"}`}>
             <p className="text-sm font-semibold uppercase tracking-wider text-[#10b981]">Trusted by Industry Leaders</p>
-            <h2 className="mt-3 text-3xl font-bold text-foreground md:text-4xl">What Our Users Say</h2>
+            <h2 className="mt-3 text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">What Our Users Say</h2>
           </div>
 
-          <div className={`mt-16 grid grid-cols-1 gap-6 md:grid-cols-3 transition-all duration-700 ${testimonialsSection.visible ? "" : "opacity-0 translate-y-8"}`}>
+          <div className={`mt-10 grid grid-cols-1 gap-4 sm:mt-16 sm:gap-6 md:grid-cols-3 transition-all duration-700 ${testimonialsSection.visible ? "" : "opacity-0 translate-y-8"}`}>
             {testimonials.map((t) => (
               <div key={t.name} className="hover-lift rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="flex gap-1">
@@ -440,14 +440,14 @@ export default function HomePage() {
       </section>
 
       {/* ───── CTA ───── */}
-      <section className="py-24 md:py-32">
-        <div ref={ctaSection.ref} className={`mx-auto max-w-4xl px-6 transition-all duration-700 ${ctaSection.visible ? "animate-scale-in" : "opacity-0"}`}>
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a2332] via-[#2C3E50] to-[#1a2332] p-12 text-center md:p-16">
+      <section className="py-16 sm:py-24 md:py-32">
+        <div ref={ctaSection.ref} className={`mx-auto max-w-4xl px-4 transition-all duration-700 sm:px-6 ${ctaSection.visible ? "animate-scale-in" : "opacity-0"}`}>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a2332] via-[#2C3E50] to-[#1a2332] p-8 text-center sm:rounded-3xl sm:p-12 md:p-16">
             <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #FFC107 0%, transparent 40%)" }} />
             <div className="relative">
-              <h2 className="text-3xl font-bold text-white md:text-4xl">Ready to Transform Your Safety Compliance?</h2>
+              <h2 className="text-2xl font-bold text-white sm:text-3xl md:text-4xl">Ready to Transform Your Safety Compliance?</h2>
               <p className="mx-auto mt-4 max-w-xl text-white/60">Join thousands of construction companies managing safety with CSCMS. Get started in minutes.</p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-8 sm:gap-4">
                 <Link
                   href="/register"
                   className="group flex items-center gap-2 rounded-xl bg-[#FFC107] px-8 py-3.5 text-sm font-bold text-[#1a1a2e] transition-all hover:bg-[#ffca2c] hover:shadow-xl hover:shadow-[#FFC107]/30"
@@ -462,7 +462,7 @@ export default function HomePage() {
                   Sign In
                 </Link>
               </div>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-sm text-white/40">
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-white/40 sm:mt-6 sm:gap-6 sm:text-sm">
                 <span className="flex items-center gap-1.5"><Smartphone className="h-4 w-4" /> Web & Mobile Ready</span>
                 <span className="flex items-center gap-1.5"><Lock className="h-4 w-4" /> Enterprise Security</span>
                 <span className="flex items-center gap-1.5"><FileBarChart className="h-4 w-4" /> Govt. Audit Compliant</span>
@@ -473,17 +473,17 @@ export default function HomePage() {
       </section>
 
       {/* ───── Footer ───── */}
-      <footer className="border-t border-border bg-card py-12">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex items-center gap-3">
+      <footer className="border-t border-border bg-card py-8 sm:py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FFC107]">
                 <HardHat className="h-4 w-4 text-[#1a1a2e]" />
               </div>
               <span className="font-bold text-foreground">CSCMS</span>
-              <span className="text-sm text-muted-foreground">Construction Safety Compliance Management System</span>
+              <span className="hidden text-sm text-muted-foreground sm:inline">Construction Safety Compliance Management System</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground sm:gap-6">
               <a href="#features" className="transition-colors hover:text-foreground">Features</a>
               <a href="#roles" className="transition-colors hover:text-foreground">Roles</a>
               <Link href="/login" className="transition-colors hover:text-foreground">Sign In</Link>

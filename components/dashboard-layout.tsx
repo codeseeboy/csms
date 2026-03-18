@@ -6,15 +6,15 @@ import { cn } from "@/lib/utils"
 import type { ReactNode } from "react"
 
 function DashboardContent({ children }: { children: ReactNode }) {
-  const { isOpen } = useSidebar()
+  const { isOpen, isMobile } = useSidebar()
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen min-h-dvh bg-background">
       <AppSidebar />
       <main
         className={cn(
-          "flex-1 transition-all duration-300",
-          isOpen ? "ml-64" : "ml-[68px]"
+          "min-w-0 flex-1 transition-all duration-300",
+          isMobile ? "" : isOpen ? "ml-64" : "ml-[68px]"
         )}
       >
         {children}

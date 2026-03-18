@@ -10,7 +10,7 @@ export default function WorkersPage() {
     <AuthGuard allowedRoles={["Admin", "Safety Inspector", "Contractor"]}>
       <DashboardLayout>
         <TopNavbar title="Worker Management" />
-        <div className="space-y-6 p-6">
+        <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
           <section aria-label="Worker Management">
             <CscmsWorkerManagement />
           </section>
