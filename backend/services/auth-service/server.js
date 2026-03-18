@@ -105,8 +105,9 @@ app.post('/auth/register', async (req, res) => {
     const existing = await User.findOne({ email: normalizedEmail });
     if (existing) return res.status(409).json({ message: 'Email already exists' });
 
-    const allowedRole = String(role || 'WORKER').toUpperCase();
-    const finalRole = allowedRole === 'WORKER' ? 'WORKER' : 'WORKER';
+    const ALLOWED_ROLES = ["ADMIN", "SAFETY_INSPECTOR", "CONTRACTOR", "WORKER", "AUTHORITY"];
+    const requestedRole = String(role || "WORKER").toUpperCase();
+    const finalRole = ALLOWED_ROLES.includes(requestedRole) ? requestedRole : "WORKER";
 
     const passwordHash = await bcrypt.hash(String(password), 10);
 
