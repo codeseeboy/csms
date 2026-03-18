@@ -2,15 +2,27 @@
   "name": "cscms-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "CSCMS backend microservices (Node.js + Express)",
+  "description": "CSCMS backend — Construction Safety Compliance Management System",
   "scripts": {
+    "start": "node server.js",
     "dev": "concurrently \"npm run dev --prefix api-gateway\" \"npm run dev --prefix services/auth-service\" \"npm run dev --prefix services/workers-service\" \"npm run dev --prefix services/incidents-service\" \"npm run dev --prefix services/inspections-service\"",
     "install:all": "npm install --prefix api-gateway && npm install --prefix services/auth-service && npm install --prefix services/workers-service && npm install --prefix services/incidents-service && npm install --prefix services/inspections-service"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.3.1",
+    "multer": "^1.4.5-lts.2",
+    "pdfkit": "^0.18.0"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
   },
-  "dependencies": {
-    "mongoose": "^9.3.1"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
