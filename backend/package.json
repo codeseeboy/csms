@@ -1,0 +1,16 @@
+{
+  "name": "cscms-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CSCMS backend microservices (Node.js + Express)",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix api-gateway\" \"npm run dev --prefix services/auth-service\" \"npm run dev --prefix services/workers-service\" \"npm run dev --prefix services/incidents-service\" \"npm run dev --prefix services/inspections-service\"",
+    "install:all": "npm install --prefix api-gateway && npm install --prefix services/auth-service && npm install --prefix services/workers-service && npm install --prefix services/incidents-service && npm install --prefix services/inspections-service"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "mongoose": "^9.3.1"
+  }
+}
