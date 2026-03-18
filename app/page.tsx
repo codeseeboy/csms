@@ -198,7 +198,7 @@ export default function HomePage() {
   if (currentUser) return null
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen min-w-0 overflow-x-hidden bg-background">
       {/* ───── Navbar ───── */}
       <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 min-h-[3.5rem] max-w-7xl items-center justify-between gap-2 px-4 sm:h-16 sm:px-6">
@@ -302,7 +302,9 @@ export default function HomePage() {
       <section className="relative -mt-1 bg-[#1a2332] py-10 sm:py-16">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 md:gap-8">
           {stats.map((s) => (
-            <StatCard key={s.label} {...s} />
+            <div key={s.label} className="min-w-0">
+              <StatCard {...s} />
+            </div>
           ))}
         </div>
       </section>

@@ -140,7 +140,7 @@ export default function AdminUsersPage() {
                           {user.role} | {user.email} | {user.id}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
                         <Select
                           value={updatingUserId === user.id ? updatingRole : user.role}
                           onValueChange={(v) => {
@@ -148,7 +148,7 @@ export default function AdminUsersPage() {
                             setUpdatingRole(v)
                           }}
                         >
-                          <SelectTrigger className="w-[180px]">
+                          <SelectTrigger className="min-w-0 w-full sm:w-[180px]">
                             <SelectValue placeholder="Role" />
                           </SelectTrigger>
                           <SelectContent>

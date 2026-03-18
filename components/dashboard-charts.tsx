@@ -90,7 +90,7 @@ function ChartCard({
   badge?: string
 }) {
   return (
-    <Card className="hover-lift border-border bg-card transition-shadow hover:shadow-lg">
+    <Card className="hover-lift min-w-0 border-border bg-card transition-shadow hover:shadow-lg">
       <CardHeader className="flex flex-row items-center gap-2 pb-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: `${iconColor}15` }}>
           <Icon className="h-4 w-4" style={{ color: iconColor }} />
@@ -102,7 +102,7 @@ function ChartCard({
           </span>
         )}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="min-w-0 overflow-hidden">{children}</CardContent>
     </Card>
   )
 }
@@ -114,7 +114,7 @@ export function DashboardCharts() {
   const totalIncidents = monthlyIncidents.reduce((sum, m) => sum + m.incidents, 0)
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
+    <div className="grid min-w-0 grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
       {/* Incidents Bar + Area overlay */}
       <ChartCard title="Monthly Incidents" icon={BarChart3} iconColor="#FF6F00" badge={`${totalIncidents} total`}>
         <ResponsiveContainer width="100%" height={260}>

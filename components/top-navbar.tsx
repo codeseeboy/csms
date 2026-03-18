@@ -24,7 +24,7 @@ export function TopNavbar({ title }: TopNavbarProps) {
   const { currentUser, logout, notifications } = useCscms()
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 min-h-[3.5rem] shrink-0 items-center gap-2 border-b border-border bg-card px-3 sm:h-16 sm:gap-4 sm:px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-14 min-h-[3.5rem] min-w-0 shrink-0 items-center gap-2 overflow-hidden border-b border-border bg-card px-3 sm:h-16 sm:gap-4 sm:px-4 md:px-6">
       <button
         onClick={toggle}
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:bg-muted lg:hidden"
@@ -35,13 +35,13 @@ export function TopNavbar({ title }: TopNavbarProps) {
 
       <h2 className="min-w-0 truncate text-base font-semibold text-foreground sm:text-lg">{title}</h2>
 
-      <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3">
+      <div className="ml-auto flex min-w-0 shrink items-center gap-1 sm:gap-2 md:gap-3">
         <div className="relative hidden md:block">
           <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search..."
-            className="h-9 w-40 rounded-lg border border-input bg-background pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary lg:w-52 xl:w-64"
+            className="h-9 min-w-0 rounded-lg border border-input bg-background pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary md:w-32 lg:w-44 xl:w-56"
           />
         </div>
 
@@ -64,8 +64,8 @@ export function TopNavbar({ title }: TopNavbarProps) {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
                 <User className="h-4 w-4" />
               </div>
-              <div className="hidden text-left sm:block">
-                <p className="max-w-[120px] truncate text-sm font-medium text-foreground xl:max-w-[160px]">{currentUser?.name ?? "Guest"}</p>
+              <div className="hidden min-w-0 text-left sm:block lg:max-w-[100px] xl:max-w-[140px]">
+                <p className="truncate text-sm font-medium text-foreground">{currentUser?.name ?? "Guest"}</p>
                 <p className="truncate text-xs text-muted-foreground">{currentUser?.role ?? "No Session"}</p>
               </div>
             </button>
