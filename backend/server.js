@@ -124,12 +124,16 @@ authRouter.post("/login", async (req, res) => {
 
 authRouter.post("/register", async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body || {};
+    const { name, email, password, phone, role } = req.body || {};
     if (!name || !email || !password) return res.status(400).json({ message: "name, email and password are required" });
 
     const normalizedEmail = String(email).toLowerCase();
     const existing = await User.findOne({ email: normalizedEmail });
     if (existing) return res.status(409).json({ message: "Email already exists" });
+
+    const ALLOWED_ROLES = ["ADMIN", "SAFETY_INSPECTOR", "CONTRACTOR", "WORKER", "AUTHORITY"];
+    const requestedRole = String(role || "WORKER").toUpperCase();
+    const finalRole = ALLOWED_ROLES.includes(requestedRole) ? requestedRole : "WORKER";
 
     const passwordHash = await bcrypt.hash(String(password), 10);
     const created = await User.create({
@@ -137,7 +141,7 @@ authRouter.post("/register", async (req, res) => {
       name: String(name),
       email: normalizedEmail,
       passwordHash,
-      role: "WORKER",
+      role: finalRole,
       phone: phone ? String(phone) : "",
     });
 
