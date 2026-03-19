@@ -23,6 +23,7 @@ export type Worker = {
   trainingStatus: "Complete" | "In Progress" | "Overdue"
   assignedPPE: string
   expiryDate: string
+  userId?: string
 }
 
 export type Incident = {

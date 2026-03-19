@@ -53,6 +53,7 @@ export const seedWorkers: Worker[] = [
     trainingStatus: "Complete",
     assignedPPE: "Helmet, Harness, Gloves",
     expiryDate: "2026-08-15",
+    // Demo mapping: leave unset for most roles.
   },
   {
     id: "WRK-002",
@@ -123,6 +124,8 @@ export const seedWorkers: Worker[] = [
     trainingStatus: "Overdue",
     assignedPPE: "None",
     expiryDate: "2025-10-05",
+    // Demo mapping: link this worker profile to the seeded worker user.
+    userId: "USR-004",
   },
 ]
 

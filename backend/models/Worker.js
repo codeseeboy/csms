@@ -7,6 +7,10 @@ const workerSchema = new Schema(
     role: { type: String, required: true },
     contact: { type: String, default: "" },
 
+    // Links this worker profile to an authenticated User (needed for strict Worker RBAC).
+    // For Admin/Contractor-created worker profiles, this may be unset.
+    userId: { type: String, index: true },
+
     certStatus: {
       type: String,
       required: true,

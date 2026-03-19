@@ -167,6 +167,29 @@ authRouter.post("/register", async (req, res) => {
       phone: phone ? String(phone) : "",
     });
 
+    // SRS: Worker accounts should have a corresponding worker profile
+    // so "Worker -> view training status & expiry" can be enforced via strict RBAC.
+    if (finalRole === "WORKER") {
+      const existing = await Worker.findOne({ userId: created.userId });
+      if (!existing) {
+        const workerCount = await Worker.countDocuments({});
+        const expiry = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+        const expiryDate = expiry.toISOString().slice(0, 10);
+
+        await Worker.create({
+          id: `WRK-${String(workerCount + 1).padStart(3, "0")}`,
+          name: String(name),
+          role: "Worker",
+          contact: phone ? String(phone) : "",
+          certStatus: "Expiring",
+          trainingStatus: "In Progress",
+          assignedPPE: "None",
+          expiryDate,
+          userId: created.userId,
+        });
+      }
+    }
+
     return res.status(201).json({ id: created.userId, name: created.name, email: created.email, role: created.role, phone: created.phone || "" });
   } catch (err) {
     return res.status(500).json({ message: "Registration failed", detail: err.message });
@@ -381,15 +404,17 @@ const workersRouter = express.Router();
 workersRouter.use(requireAuth);
 
 const seedWorkers = [
-  { id: "WRK-001", name: "James Rodriguez", role: "Crane Operator", contact: "+1 555-0101", certStatus: "Valid", trainingStatus: "Complete", assignedPPE: "Helmet, Harness, Gloves", expiryDate: "2026-08-15" },
+  { id: "WRK-001", name: "James Rodriguez", role: "Crane Operator", contact: "+1 555-0101", certStatus: "Valid", trainingStatus: "Complete", assignedPPE: "Helmet, Harness, Gloves", expiryDate: "2026-08-15", userId: undefined },
   { id: "WRK-002", name: "Sarah Chen", role: "Site Supervisor", contact: "+1 555-0102", certStatus: "Expiring", trainingStatus: "Complete", assignedPPE: "Helmet, Vest, Boots", expiryDate: "2026-03-20" },
-  { id: "WRK-003", name: "Mike Thompson", role: "Electrician", contact: "+1 555-0103", certStatus: "Valid", trainingStatus: "In Progress", assignedPPE: "Helmet, Gloves, Goggles", expiryDate: "2026-11-30" },
-  { id: "WRK-004", name: "Ana Petrova", role: "Safety Inspector", contact: "+1 555-0104", certStatus: "Expiring", trainingStatus: "Overdue", assignedPPE: "Helmet, Vest", expiryDate: "2026-03-25" },
+  { id: "WRK-003", name: "Mike Thompson", role: "Electrician", contact: "+1 555-0103", certStatus: "Valid", trainingStatus: "In Progress", assignedPPE: "Helmet, Gloves, Goggles", expiryDate: "2026-11-30", userId: undefined },
+  { id: "WRK-004", name: "Ana Petrova", role: "Safety Inspector", contact: "+1 555-0104", certStatus: "Expiring", trainingStatus: "Overdue", assignedPPE: "Helmet, Vest", expiryDate: "2026-03-25", userId: "USR-004" },
 ];
 
-workersRouter.get("/", async (_req, res) => {
+workersRouter.get("/", async (req, res) => {
   try {
-    const items = await Worker.find({}).sort({ createdAt: -1 });
+    const role = String(req.auth?.role || "").toUpperCase();
+    const query = role === "WORKER" ? { userId: req.auth.id } : {};
+    const items = await Worker.find(query).sort({ createdAt: -1 });
     return res.json({ items, count: items.length });
   } catch (err) {
     return res.status(500).json({ message: "Failed to fetch workers", detail: err.message });
@@ -400,6 +425,12 @@ workersRouter.get("/:id", async (req, res) => {
   try {
     const worker = await Worker.findOne({ id: req.params.id });
     if (!worker) return res.status(404).json({ message: "Worker not found" });
+
+    const role = String(req.auth?.role || "").toUpperCase();
+    if (role === "WORKER" && String(worker.userId || "") !== String(req.auth.id)) {
+      return res.status(404).json({ message: "Worker not found" });
+    }
+
     return res.json(worker);
   } catch (err) {
     return res.status(500).json({ message: "Failed to fetch worker", detail: err.message });
@@ -492,8 +523,13 @@ const seedIncidents = [
   { id: "INC-2026-002", title: "Minor slip near parking lot", severity: "Medium", location: "Site B - Parking Lot", description: "Wet surface without warning sign.", date: "2026-02-27", status: "Under Review", photoUrl: null, evidence: [], createdByUserId: "USR-002" },
 ];
 
-incidentsRouter.get("/", async (_req, res) => {
+incidentsRouter.get("/", async (req, res) => {
   try {
+    const role = String(req.auth?.role || "").toUpperCase();
+    if (role === "WORKER") {
+      // SRS: Worker should not access system-wide incident records.
+      return res.json({ items: [], count: 0 });
+    }
     const items = await Incident.find({}).sort({ date: -1 });
     return res.json({ items, count: items.length });
   } catch (err) {
@@ -503,6 +539,10 @@ incidentsRouter.get("/", async (_req, res) => {
 
 incidentsRouter.get("/:id", async (req, res) => {
   try {
+    const role = String(req.auth?.role || "").toUpperCase();
+    if (role === "WORKER") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
     const incident = await Incident.findOne({ id: req.params.id });
     if (!incident) return res.status(404).json({ message: "Incident not found" });
     return res.json(incident);
@@ -614,8 +654,13 @@ const seedInspections = [
   { id: "INSP-001", site: "Site B", inspectorEmail: "inspector@cscms.com", inspectorName: "Ravi Kumar", date: "2026-03-20", type: "Electrical Safety", status: "Scheduled", passed: 0, failed: 0 },
 ];
 
-inspectionsRouter.get("/", async (_req, res) => {
+inspectionsRouter.get("/", async (req, res) => {
   try {
+    const role = String(req.auth?.role || "").toUpperCase();
+    if (role === "WORKER") {
+      // SRS: Worker should not access system-wide inspection records.
+      return res.json({ items: [], count: 0 });
+    }
     const items = await Inspection.find({}).sort({ date: -1 });
     return res.json({ items, count: items.length });
   } catch (err) {
