@@ -76,6 +76,28 @@ function requireRole(...roles) {
   };
 }
 
+// Classify incident severity automatically (SRS: automatic severity classification).
+function classifySeverityFromText({ title, description }) {
+  const text = `${title ?? ""} ${description ?? ""}`.toLowerCase();
+
+  // Critical signals
+  if (["fatal", "deadly", "life-threatening", "critical", "electrocution", "immediate"].some((k) => text.includes(k))) {
+    return "Critical";
+  }
+
+  // High signals
+  if (["fall", "guardrail", "scaffold", "serious", "major", "collision", "fire", "unsecured", "no harness", "harness", "injury"].some((k) => text.includes(k))) {
+    return "High";
+  }
+
+  // Medium signals
+  if (["minor slip", "near miss", "near-miss", "wet surface", "unsafe", "violation", "improper", "non-compliant", "non compliant"].some((k) => text.includes(k))) {
+    return "Medium";
+  }
+
+  return "Low";
+}
+
 // ─────────────────────── Health ───────────────────────
 
 app.get("/health", (_req, res) => {
@@ -159,6 +181,52 @@ authRouter.get("/validate", (req, res) => {
 
 authRouter.get("/notifications", requireAuth, async (req, res) => {
   try {
+    const role = String(req.auth?.role || "").toUpperCase();
+
+    // SRS: send reminders for renewals (certifications expiring soon).
+    // Generate reminders at fetch time to avoid a background job.
+    if (["ADMIN", "AUTHORITY", "WORKER"].includes(role)) {
+      const me = await User.findOne({ userId: req.auth.id });
+
+      if (me?.email) {
+        const now = new Date();
+        const in7 = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const cutoffDedup = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const cutoffIso = cutoffDedup.toISOString();
+
+        const allWorkers = await Worker.find({});
+        const expiringSoon = allWorkers
+          .filter((w) => {
+            if (!w.expiryDate) return false;
+            const exp = new Date(String(w.expiryDate));
+            if (Number.isNaN(exp.getTime())) return false;
+            return exp >= now && exp <= in7 && w.certStatus !== "Expired";
+          })
+          .slice(0, 10);
+
+        for (const w of expiringSoon) {
+          const existing = await Notification.findOne({
+            recipientUserId: req.auth.id,
+            subject: "Certification expiry reminder",
+            timestamp: { $gte: cutoffIso },
+            message: { $regex: w.id, $options: "i" },
+          });
+
+          if (existing) continue;
+
+          await Notification.create({
+            id: randomId("NOTIF"),
+            channel: "email",
+            recipient: me.email,
+            recipientUserId: req.auth.id,
+            subject: "Certification expiry reminder",
+            message: `Your certification for worker ${w.name} (${w.id}) expires on ${w.expiryDate}. Please renew immediately.`,
+            timestamp: nowIso(),
+          });
+        }
+      }
+    }
+
     const items = await Notification.find({ recipientUserId: req.auth.id }).sort({ timestamp: -1 }).limit(50);
     return res.json({ items, count: items.length });
   } catch (err) {
@@ -445,9 +513,9 @@ incidentsRouter.get("/:id", async (req, res) => {
 
 incidentsRouter.post("/", requireRole("ADMIN", "SAFETY_INSPECTOR", "CONTRACTOR", "WORKER"), async (req, res) => {
   try {
-    const { title, severity, location, description, date } = req.body || {};
-    if (!title || !severity || !location || !description || !date) {
-      return res.status(400).json({ message: "title, severity, location, description and date are required" });
+    const { title, location, description, date } = req.body || {};
+    if (!title || !location || !description || !date) {
+      return res.status(400).json({ message: "title, location, description and date are required" });
     }
 
     const count = await Incident.countDocuments({});
@@ -459,7 +527,21 @@ incidentsRouter.post("/", requireRole("ADMIN", "SAFETY_INSPECTOR", "CONTRACTOR",
       const eName = req.body?.evidenceOriginalName ? String(req.body.evidenceOriginalName) : "evidence";
       const eMime = req.body?.evidenceMimeType ? String(req.body.evidenceMimeType) : "application/octet-stream";
 
-      const ext = path.extname(eName) || "";
+      const extFromName = path.extname(eName) || "";
+      const lowerMime = String(eMime).toLowerCase();
+      const extFromMime = (() => {
+        if (lowerMime.includes("png")) return ".png";
+        if (lowerMime.includes("jpeg") || lowerMime.includes("jpg")) return ".jpg";
+        if (lowerMime.includes("pdf")) return ".pdf";
+        if (lowerMime.includes("mp4")) return ".mp4";
+        if (lowerMime.includes("webm")) return ".webm";
+        if (lowerMime.includes("quicktime") || lowerMime.includes("mov")) return ".mov";
+        if (lowerMime.includes("matroska") || lowerMime.includes("mkv")) return ".mkv";
+        if (lowerMime.includes("ogg")) return ".ogg";
+        return "";
+      })();
+
+      const ext = extFromName || extFromMime || "";
       const filename = `${Date.now()}_${Math.random().toString(16).slice(2)}${ext}`;
       const dir = path.join(UPLOAD_ROOT, "incidents");
       fs.mkdirSync(dir, { recursive: true });
@@ -472,9 +554,19 @@ incidentsRouter.post("/", requireRole("ADMIN", "SAFETY_INSPECTOR", "CONTRACTOR",
       evidence.push({ originalName: eName, mimeType: eMime, filename, size: fs.statSync(filePath).size, path: filePath, uploadedAt: new Date() });
     }
 
+    const incidentSeverity = classifySeverityFromText({ title, description });
+
     const incident = await Incident.create({
       id: `INC-${new Date().getFullYear()}-${String(count + 1).padStart(3, "0")}`,
-      title, severity, location, description, date, photoUrl, evidence, status: "Open", createdByUserId: req.auth.id,
+      title,
+      severity: incidentSeverity,
+      location,
+      description,
+      date,
+      photoUrl,
+      evidence,
+      status: "Open",
+      createdByUserId: req.auth.id,
     });
 
     await AuditLog.create({ id: randomId("AUDIT"), action: "INCIDENT_CREATED", userId: req.auth.id, module: "/incident-reports", details: `${incident.id} (${incident.severity}) at ${incident.location}`, timestamp: nowIso() });
@@ -597,13 +689,106 @@ inspectionsRouter.patch("/:id/complete", requireRole("SAFETY_INSPECTOR"), async 
     }
 
     const recipients = await User.find({ role: { $in: ["ADMIN", "AUTHORITY"] } });
-    const notifs = [];
     const hasViolations = Number(failed) > 0;
-    for (const u of recipients) {
-      if (u.email) notifs.push({ id: randomId("NOTIF"), channel: "email", recipient: u.email, recipientUserId: u.userId, subject: hasViolations ? "CSCMS Alert: Inspection violations detected" : "CSCMS Update: Inspection completed", message: hasViolations ? `Inspection ${updated.id} for ${updated.site} has violations (passed=${passed}, failed=${failed}).` : `Inspection ${updated.id} for ${updated.site} completed. Score=${score ?? "N/A"}%.`, timestamp: nowIso() });
-      if (u.phone) notifs.push({ id: randomId("NOTIF"), channel: "sms", recipient: u.phone, recipientUserId: u.userId, message: hasViolations ? `CSCMS: Inspection ${updated.id} (${updated.site}) has violations.` : `CSCMS: Inspection ${updated.id} (${updated.site}) completed.`, timestamp: nowIso() });
+
+    if (hasViolations) {
+      // SRS: IF checklist fails -> create incident/violation record and generate alerts.
+      const violatedLabels = (updated.checklistItems || [])
+        .filter((it) => !it.compliant)
+        .map((it) => it.label)
+        .filter(Boolean);
+
+      const totalItems = Number(passed) + Number(failed);
+      const ratio = totalItems > 0 ? Number(failed) / totalItems : 0;
+      const severityFromRatio = (() => {
+        if (ratio >= 0.5) return "Critical";
+        if (ratio >= 0.34) return "High";
+        if (ratio >= 0.17) return "Medium";
+        return "Low";
+      })();
+
+      const title = `Inspection Violation - ${updated.id}`;
+      const description = `Non-compliant checklist items: ${violatedLabels.join(", ") || "N/A"}. Passed=${passed}, Failed=${failed}. Score=${score ?? "N/A"}%.`;
+
+      // Let keyword classifier refine/override the ratio-derived severity.
+      const computed = classifySeverityFromText({ title, description });
+      const incidentSeverity = computed || severityFromRatio;
+
+      const incidentCount = await Incident.countDocuments({});
+      const incident = await Incident.create({
+        id: `INC-${new Date().getFullYear()}-${String(incidentCount + 1).padStart(3, "0")}`,
+        title,
+        severity: incidentSeverity,
+        location: updated.site,
+        description,
+        date: updated.date,
+        photoUrl: photoUrl ?? null,
+        evidence: evidence ?? [],
+        status: "Open",
+        createdByUserId: req.auth.id,
+      });
+
+      await AuditLog.create({
+        id: randomId("AUDIT"),
+        action: "INCIDENT_CREATED",
+        userId: req.auth.id,
+        module: "/incident-reports",
+        details: `${incident.id} (${incident.severity}) at ${incident.location}`,
+        timestamp: nowIso(),
+      });
+
+      const notifications = [];
+      for (const u of recipients) {
+        if (u.email) {
+          notifications.push({
+            id: randomId("NOTIF"),
+            channel: "email",
+            recipient: u.email,
+            recipientUserId: u.userId,
+            subject: `CSCMS Alert: ${incident.severity} incident reported`,
+            message: `${incident.title} at ${incident.location}. Status: ${incident.status}.`,
+            timestamp: nowIso(),
+          });
+        }
+        if (u.phone) {
+          notifications.push({
+            id: randomId("NOTIF"),
+            channel: "sms",
+            recipient: u.phone,
+            recipientUserId: u.userId,
+            message: `CSCMS: ${incident.severity} incident at ${incident.location}. Check dashboard.`,
+            timestamp: nowIso(),
+          });
+        }
+      }
+      if (notifications.length > 0) await Notification.insertMany(notifications);
+    } else {
+      const notifs = [];
+      for (const u of recipients) {
+        if (u.email) {
+          notifs.push({
+            id: randomId("NOTIF"),
+            channel: "email",
+            recipient: u.email,
+            recipientUserId: u.userId,
+            subject: "CSCMS Update: Inspection completed",
+            message: `Inspection ${updated.id} for ${updated.site} completed. Score=${score ?? "N/A"}%.`,
+            timestamp: nowIso(),
+          });
+        }
+        if (u.phone) {
+          notifs.push({
+            id: randomId("NOTIF"),
+            channel: "sms",
+            recipient: u.phone,
+            recipientUserId: u.userId,
+            message: `CSCMS: Inspection ${updated.id} (${updated.site}) completed.`,
+            timestamp: nowIso(),
+          });
+        }
+      }
+      if (notifs.length > 0) await Notification.insertMany(notifs);
     }
-    if (notifs.length > 0) await Notification.insertMany(notifs);
 
     return res.json(updated);
   } catch (err) {
