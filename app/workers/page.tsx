@@ -7,7 +7,7 @@ import { CscmsWorkerManagement } from "@/components/cscms-worker-management"
 
 export default function WorkersPage() {
   return (
-    <AuthGuard allowedRoles={["Admin", "Safety Inspector", "Contractor"]}>
+    <AuthGuard allowedRoles={["Admin", "Contractor"]}>
       <DashboardLayout>
         <TopNavbar title="Worker Management" />
         <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">

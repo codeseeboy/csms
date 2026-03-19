@@ -167,6 +167,13 @@ function DashboardContent() {
     { label: "Manage Workers", href: "/workers", icon: Users, color: "#2C3E50", bg: "bg-[#2C3E50]/10" },
     { label: "View Reports", href: "/reports", icon: FileBarChart, color: "#6366f1", bg: "bg-[#6366f1]/10" },
   ]
+  
+  // SRS: Safety Inspector should not manage workers.
+  const role = currentUser?.role
+  const filteredQuickActions =
+    role === "Safety Inspector"
+      ? quickActions.filter((a) => a.label !== "Manage Workers")
+      : quickActions
 
   const recentActivity = auditLogs.slice(0, 5)
 
@@ -209,7 +216,7 @@ function DashboardContent() {
 
       {/* Quick Actions */}
       <div className={`grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 transition-all duration-700 ${mounted ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
-        {quickActions.map((action) => (
+        {filteredQuickActions.map((action) => (
           <Link key={action.label} href={action.href}>
             <Card className="hover-lift group cursor-pointer border-border bg-card transition-all hover:border-[#FFC107]/30 hover:shadow-lg hover:shadow-[#FFC107]/5">
               <CardContent className="flex items-center gap-3 p-4">
