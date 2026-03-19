@@ -35,7 +35,10 @@ function DashboardContent() {
 
   useEffect(() => { setMounted(true) }, [])
 
-  const isWorker = currentUser?.role === "Worker"
+  const roleRaw = currentUser?.role ? String(currentUser.role) : ""
+  const roleLc = roleRaw.toLowerCase()
+
+  const isWorker = roleLc === "worker"
   const myWorker =
     isWorker && currentUser
       ? workers.find((w) => w.userId === currentUser.id) ?? (workers.length === 1 ? workers[0] : undefined)
@@ -168,14 +171,14 @@ function DashboardContent() {
     { label: "View Reports", href: "/reports", icon: FileBarChart, color: "#6366f1", bg: "bg-[#6366f1]/10" },
   ]
   
-  // SRS: worker management is for Contractor only.
-  const role = currentUser?.role
+  // SRS: worker/inspection/incident actions are role-scoped. Normalize role string defensively.
+  const role = roleLc
   const filteredQuickActions =
-    role === "Contractor"
+    role === "contractor"
       ? quickActions
-      : role === "Admin"
+      : role === "admin"
         ? quickActions.filter((a) => a.label !== "Schedule Inspection" && a.label !== "Report Incident" && a.label !== "Manage Workers")
-        : quickActions.filter((a) => a.label !== "Manage Workers")
+        : quickActions.filter((a) => a.label !== "Manage Workers" && a.label !== "Schedule Inspection" && a.label !== "Report Incident")
 
   const recentActivity = auditLogs.slice(0, 5)
 
