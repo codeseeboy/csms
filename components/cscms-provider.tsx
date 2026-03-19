@@ -179,6 +179,48 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
     return { response, data }
   }
 
+  // SRS/RBAC: currentUser.role must be derived from the active JWT, not only from localStorage.
+  // Otherwise, stale localStorage can cause AuthGuard to deny correct users (e.g. /reports for Authority).
+  useEffect(() => {
+    if (!sessionToken) return
+
+    let isCancelled = false
+
+    const validate = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/auth/validate`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        })
+
+        if (!res.ok) return
+
+        const data = await res.json().catch(() => ({}))
+        const u = data?.user
+        if (!u?.role) return
+
+        const seedUser = users.find((x) => x.email.toLowerCase() === String(u.email ?? "").toLowerCase())
+
+        if (isCancelled) return
+        setCurrentUser({
+          id: String(u.id ?? ""),
+          email: String(u.email ?? ""),
+          role: mapRole(String(u.role ?? "ADMIN")),
+          name: String(u.name ?? seedUser?.name ?? ""),
+          phone: seedUser?.phone ?? "",
+          password: seedUser?.password ?? "",
+        })
+      } catch {
+        // best-effort; keep existing localStorage state if validation fails
+      }
+    }
+
+    void validate()
+    return () => {
+      isCancelled = true
+    }
+  }, [sessionToken, users])
+
   const fileToBase64 = (file: File) =>
     new Promise<string>((resolve, reject) => {
       const reader = new FileReader()
