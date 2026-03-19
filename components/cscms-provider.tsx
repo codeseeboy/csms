@@ -235,10 +235,15 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
 
   const syncAuditAndNotifications = async () => {
     try {
+      const canAudit = currentUser?.role === "Admin"
+      const canCompliance = currentUser?.role === "Admin" || currentUser?.role === "Government Authority"
+
       const [notificationsRes, auditLogsRes, complianceRes] = await Promise.all([
         callApi("/auth/notifications", { method: "GET" }),
-        callApi("/auth/audit-logs", { method: "GET" }),
-        callApi("/auth/compliance-records", { method: "GET" }),
+        canAudit ? callApi("/auth/audit-logs", { method: "GET" }) : Promise.resolve({ response: { ok: false }, data: { items: [] } }),
+        canCompliance
+          ? callApi("/auth/compliance-records", { method: "GET" })
+          : Promise.resolve({ response: { ok: false }, data: { items: [] } }),
       ])
 
       if (notificationsRes.response.ok && Array.isArray(notificationsRes.data.items)) {
@@ -258,21 +263,21 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    if (!sessionToken) {
-      return
-    }
+    if (!sessionToken) return
 
     let isCancelled = false
 
     const syncFromBackend = async () => {
+      const canAudit = currentUser?.role === "Admin"
+      const canCompliance = currentUser?.role === "Admin" || currentUser?.role === "Government Authority"
       try {
         const [workersRes, incidentsRes, inspectionsRes, notificationsRes, auditLogsRes, complianceRes] = await Promise.all([
           callApi("/workers", { method: "GET" }),
           callApi("/incidents", { method: "GET" }),
           callApi("/inspections", { method: "GET" }),
           callApi("/auth/notifications", { method: "GET" }),
-          callApi("/auth/audit-logs", { method: "GET" }),
-          callApi("/auth/compliance-records", { method: "GET" }),
+          canAudit ? callApi("/auth/audit-logs", { method: "GET" }) : Promise.resolve({ response: { ok: false }, data: { items: [] } }),
+          canCompliance ? callApi("/auth/compliance-records", { method: "GET" }) : Promise.resolve({ response: { ok: false }, data: { items: [] } }),
         ])
 
         if (isCancelled) {
@@ -342,7 +347,7 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isCancelled = true
     }
-  }, [sessionToken])
+  }, [sessionToken, currentUser?.role])
 
   const addAuditLog = (action: string, module: string, details: string) => {
     const userId = currentUser?.id ?? "SYSTEM"

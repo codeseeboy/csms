@@ -68,10 +68,23 @@ function requireAuth(req, res, next) {
   return next();
 }
 
+function normalizeRole(roleRaw) {
+  const s = String(roleRaw ?? "")
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, "_")
+
+  // SRS label vs DB role normalization
+  if (s === "GOVERNMENT_AUTHORITY") return "AUTHORITY"
+
+  return s
+}
+
 function requireRole(...roles) {
   return (req, res, next) => {
-    const role = String(req.auth?.role || "").toUpperCase();
-    if (!roles.includes(role)) return res.status(403).json({ message: "Forbidden" });
+    const role = normalizeRole(req.auth?.role)
+    const normalizedAllowed = roles.map(normalizeRole)
+    if (!normalizedAllowed.includes(role)) return res.status(403).json({ message: "Forbidden" });
     return next();
   };
 }
