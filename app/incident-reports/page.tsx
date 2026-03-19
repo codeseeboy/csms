@@ -34,7 +34,7 @@ function statusColor(s: string) {
 }
 
 export default function IncidentReportsPage() {
-  const { incidents, submitIncident, notifications } = useCscms()
+  const { incidents, submitIncident, notifications, currentUser } = useCscms()
 
   const [title, setTitle] = useState("")
   const [severity, setSeverity] = useState<"Low" | "Medium" | "High" | "Critical">("High")
@@ -82,7 +82,7 @@ export default function IncidentReportsPage() {
   }
 
   return (
-    <AuthGuard allowedRoles={["Safety Inspector", "Contractor"]}>
+    <AuthGuard allowedRoles={["Safety Inspector", "Government Authority"]}>
       <DashboardLayout>
         <TopNavbar title="Incident Reports" />
         <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
@@ -93,75 +93,77 @@ export default function IncidentReportsPage() {
             <Card><CardContent className="flex items-center gap-3 p-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFC107]/10"><Clock className="h-5 w-5 text-[#FFC107]" /></div><div><p className="text-xl font-bold">{reviewCount}</p><p className="text-xs text-muted-foreground">Under Review</p></div></CardContent></Card>
           </div>
 
-          {/* Report Form */}
-          <Card>
-            <CardHeader className="flex flex-row items-center gap-2 pb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626]/10"><AlertTriangle className="h-4 w-4 text-[#dc2626]" /></div>
-              <CardTitle className="text-sm font-semibold">Report New Incident</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4" onSubmit={onSubmit}>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">Incident Title *</label>
-                    <input className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Fall from scaffold - Site A" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">Severity *</label>
-                    <select className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={severity} onChange={(e) => setSeverity(e.target.value as typeof severity)}>
-                      <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">Location *</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <input className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Building A - Floor 3" />
+          {/* Report Form (Inspector only) */}
+          {currentUser?.role === "Safety Inspector" && (
+            <Card>
+              <CardHeader className="flex flex-row items-center gap-2 pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626]/10"><AlertTriangle className="h-4 w-4 text-[#dc2626]" /></div>
+                <CardTitle className="text-sm font-semibold">Report New Incident</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4" onSubmit={onSubmit}>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Incident Title *</label>
+                      <input className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Fall from scaffold - Site A" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Severity *</label>
+                      <select className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={severity} onChange={(e) => setSeverity(e.target.value as typeof severity)}>
+                        <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Location *</label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <input className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Building A - Floor 3" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-muted-foreground">Date *</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <input type="date" className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={date} onChange={(e) => setDate(e.target.value)} />
+                      </div>
                     </div>
                   </div>
+
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">Date *</label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <input type="date" className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={date} onChange={(e) => setDate(e.target.value)} />
+                    <label className="text-xs font-medium text-muted-foreground">Description *</label>
+                    <textarea className="min-h-24 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Detailed description of the incident..." />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Evidence (PDF/JPG/PNG/Video — max 5MB)</label>
+                    <div className="flex items-center gap-3">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40">
+                        <Upload className="h-4 w-4" />
+                        {evidenceFile ? evidenceFile.name : "Choose file"}
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.jpg,.jpeg,.png,.mp4,.webm,.mov,.mkv,.ogg"
+                          onChange={(e) => onFileChange(e.target.files?.[0] ?? null)}
+                        />
+                      </label>
                     </div>
                   </div>
-                </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Description *</label>
-                  <textarea className="min-h-24 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107]" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Detailed description of the incident..." />
-                </div>
+                  {feedback && (
+                    <div className={`rounded-lg border p-3 text-sm ${feedback.ok ? "border-[#10b981]/30 bg-[#10b981]/5 text-[#10b981]" : "border-[#dc2626]/30 bg-[#dc2626]/5 text-[#dc2626]"}`}>
+                      {feedback.text}
+                    </div>
+                  )}
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Evidence (PDF/JPG/PNG/Video — max 5MB)</label>
-                  <div className="flex items-center gap-3">
-                    <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40">
-                      <Upload className="h-4 w-4" />
-                      {evidenceFile ? evidenceFile.name : "Choose file"}
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept=".pdf,.jpg,.jpeg,.png,.mp4,.webm,.mov,.mkv,.ogg"
-                        onChange={(e) => onFileChange(e.target.files?.[0] ?? null)}
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                {feedback && (
-                  <div className={`rounded-lg border p-3 text-sm ${feedback.ok ? "border-[#10b981]/30 bg-[#10b981]/5 text-[#10b981]" : "border-[#dc2626]/30 bg-[#dc2626]/5 text-[#dc2626]"}`}>
-                    {feedback.text}
-                  </div>
-                )}
-
-                <button type="submit" disabled={isSubmitting} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#FFC107] text-sm font-bold text-[#1a1a2e] transition-all hover:bg-[#ffca2c] disabled:opacity-50">
-                  <Send className="h-4 w-4" />
-                  {isSubmitting ? "Submitting..." : "Submit Incident Report"}
-                </button>
-              </form>
-            </CardContent>
-          </Card>
+                  <button type="submit" disabled={isSubmitting} className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#FFC107] text-sm font-bold text-[#1a1a2e] transition-all hover:bg-[#ffca2c] disabled:opacity-50">
+                    <Send className="h-4 w-4" />
+                    {isSubmitting ? "Submitting..." : "Submit Incident Report"}
+                  </button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Recent Incidents */}
           <Card>

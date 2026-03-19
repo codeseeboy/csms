@@ -257,7 +257,7 @@ authRouter.get("/notifications", requireAuth, async (req, res) => {
   }
 });
 
-authRouter.get("/audit-logs", requireAuth, requireRole("ADMIN", "AUTHORITY"), async (_req, res) => {
+authRouter.get("/audit-logs", requireAuth, requireRole("ADMIN"), async (_req, res) => {
   try {
     const items = await AuditLog.find({}).sort({ timestamp: -1 }).limit(200);
     return res.json({ items, count: items.length });
@@ -331,7 +331,7 @@ authRouter.patch("/users/:userId", requireAuth, requireRole("ADMIN"), async (req
   }
 });
 
-authRouter.get("/reports/compliance/pdf", requireAuth, requireRole("ADMIN", "AUTHORITY"), async (req, res) => {
+authRouter.get("/reports/compliance/pdf", requireAuth, requireRole("ADMIN"), async (req, res) => {
   try {
     const { from, to } = req.query || {};
     const filter = {};
@@ -364,7 +364,7 @@ authRouter.get("/reports/compliance/pdf", requireAuth, requireRole("ADMIN", "AUT
   }
 });
 
-authRouter.get("/reports/compliance/excel", requireAuth, requireRole("ADMIN", "AUTHORITY"), async (req, res) => {
+authRouter.get("/reports/compliance/excel", requireAuth, requireRole("ADMIN"), async (req, res) => {
   try {
     const { from, to } = req.query || {};
     const filter = {};
@@ -526,7 +526,7 @@ const seedIncidents = [
 incidentsRouter.get("/", async (req, res) => {
   try {
     const role = String(req.auth?.role || "").toUpperCase();
-    if (role === "WORKER") {
+    if (role === "WORKER" || role === "CONTRACTOR") {
       // SRS: Worker should not access system-wide incident records.
       return res.json({ items: [], count: 0 });
     }
@@ -540,7 +540,7 @@ incidentsRouter.get("/", async (req, res) => {
 incidentsRouter.get("/:id", async (req, res) => {
   try {
     const role = String(req.auth?.role || "").toUpperCase();
-    if (role === "WORKER") {
+    if (role === "WORKER" || role === "CONTRACTOR") {
       return res.status(403).json({ message: "Forbidden" });
     }
     const incident = await Incident.findOne({ id: req.params.id });
@@ -551,7 +551,7 @@ incidentsRouter.get("/:id", async (req, res) => {
   }
 });
 
-incidentsRouter.post("/", requireRole("SAFETY_INSPECTOR", "CONTRACTOR", "WORKER"), async (req, res) => {
+incidentsRouter.post("/", requireRole("SAFETY_INSPECTOR"), async (req, res) => {
   try {
     const { title, location, description, date } = req.body || {};
     if (!title || !location || !description || !date) {
@@ -611,7 +611,7 @@ incidentsRouter.post("/", requireRole("SAFETY_INSPECTOR", "CONTRACTOR", "WORKER"
 
     await AuditLog.create({ id: randomId("AUDIT"), action: "INCIDENT_CREATED", userId: req.auth.id, module: "/incident-reports", details: `${incident.id} (${incident.severity}) at ${incident.location}`, timestamp: nowIso() });
 
-    const recipients = await User.find({ role: { $in: ["ADMIN", "AUTHORITY"] } });
+    const recipients = await User.find({ role: { $in: ["ADMIN", "AUTHORITY", "CONTRACTOR"] } });
     const notifications = [];
     for (const u of recipients) {
       if (u.email) notifications.push({ id: randomId("NOTIF"), channel: "email", recipient: u.email, recipientUserId: u.userId, subject: `CSCMS Alert: ${incident.severity} incident reported`, message: `${incident.title} at ${incident.location}. Status: ${incident.status}.`, timestamp: nowIso() });
@@ -625,7 +625,7 @@ incidentsRouter.post("/", requireRole("SAFETY_INSPECTOR", "CONTRACTOR", "WORKER"
   }
 });
 
-incidentsRouter.patch("/:id/status", requireRole("SAFETY_INSPECTOR", "CONTRACTOR"), async (req, res) => {
+incidentsRouter.patch("/:id/status", requireRole("SAFETY_INSPECTOR"), async (req, res) => {
   try {
     const { status } = req.body || {};
     if (!status) return res.status(400).json({ message: "status is required" });
@@ -657,8 +657,8 @@ const seedInspections = [
 inspectionsRouter.get("/", async (req, res) => {
   try {
     const role = String(req.auth?.role || "").toUpperCase();
-    if (role === "WORKER") {
-      // SRS: Worker should not access system-wide inspection records.
+    if (role === "WORKER" || role === "CONTRACTOR") {
+      // SRS: Worker/Contractor should not access system-wide inspection records.
       return res.json({ items: [], count: 0 });
     }
     const items = await Inspection.find({}).sort({ date: -1 });
@@ -733,7 +733,7 @@ inspectionsRouter.patch("/:id/complete", requireRole("SAFETY_INSPECTOR"), async 
       await ComplianceRecord.create({ id: randomId("COMP"), inspectionId: updated.id, site: updated.site, inspectorName: updated.inspectorName || "Inspector", score, createdAt: nowIso() });
     }
 
-    const recipients = await User.find({ role: { $in: ["ADMIN", "AUTHORITY"] } });
+    const recipients = await User.find({ role: { $in: ["ADMIN", "AUTHORITY", "CONTRACTOR"] } });
     const hasViolations = Number(failed) > 0;
 
     if (hasViolations) {

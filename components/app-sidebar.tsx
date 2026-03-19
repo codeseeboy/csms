@@ -32,13 +32,16 @@ const roleNavItems = {
   Contractor: [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Workers", href: "/workers", icon: Users },
-    { label: "Incidents", href: "/incident-reports", icon: AlertTriangle },
   ],
   Worker: [
     { label: "Training", href: "/training", icon: ClipboardCheck },
     { label: "Safety Updates", href: "/safety-updates", icon: AlertTriangle },
   ],
   "Government Authority": [
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Inspections", href: "/inspections", icon: ClipboardCheck },
+    { label: "Incident Reports", href: "/incident-reports", icon: AlertTriangle },
+    { label: "Safety Updates", href: "/safety-updates", icon: AlertTriangle },
     { label: "Reports", href: "/reports", icon: FileBarChart },
   ],
 } as const

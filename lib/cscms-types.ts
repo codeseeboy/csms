@@ -19,6 +19,7 @@ export type Worker = {
   name: string
   role: string
   contact: string
+  site?: string
   certStatus: "Valid" | "Expiring" | "Expired"
   trainingStatus: "Complete" | "In Progress" | "Overdue"
   assignedPPE: string
