@@ -12,7 +12,7 @@ export default function InspectionSchedulePage() {
   }, [router])
 
   return (
-    <AuthGuard allowedRoles={["Admin", "Safety Inspector"]}>
+    <AuthGuard allowedRoles={["Safety Inspector"]}>
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="rounded-xl border border-border bg-card p-6 text-center shadow-sm">
           <h1 className="text-xl font-semibold">Inspection Scheduling</h1>

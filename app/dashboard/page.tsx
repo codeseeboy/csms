@@ -171,7 +171,11 @@ function DashboardContent() {
   // SRS: worker management is for Contractor only.
   const role = currentUser?.role
   const filteredQuickActions =
-    role === "Contractor" ? quickActions : quickActions.filter((a) => a.label !== "Manage Workers")
+    role === "Contractor"
+      ? quickActions
+      : role === "Admin"
+        ? quickActions.filter((a) => a.label !== "Schedule Inspection" && a.label !== "Report Incident" && a.label !== "Manage Workers")
+        : quickActions.filter((a) => a.label !== "Manage Workers")
 
   const recentActivity = auditLogs.slice(0, 5)
 

@@ -82,7 +82,7 @@ export default function IncidentReportsPage() {
   }
 
   return (
-    <AuthGuard allowedRoles={["Admin", "Safety Inspector", "Contractor"]}>
+    <AuthGuard allowedRoles={["Safety Inspector", "Contractor"]}>
       <DashboardLayout>
         <TopNavbar title="Incident Reports" />
         <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">

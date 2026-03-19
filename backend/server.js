@@ -551,7 +551,7 @@ incidentsRouter.get("/:id", async (req, res) => {
   }
 });
 
-incidentsRouter.post("/", requireRole("ADMIN", "SAFETY_INSPECTOR", "CONTRACTOR", "WORKER"), async (req, res) => {
+incidentsRouter.post("/", requireRole("SAFETY_INSPECTOR", "CONTRACTOR", "WORKER"), async (req, res) => {
   try {
     const { title, location, description, date } = req.body || {};
     if (!title || !location || !description || !date) {
@@ -625,7 +625,7 @@ incidentsRouter.post("/", requireRole("ADMIN", "SAFETY_INSPECTOR", "CONTRACTOR",
   }
 });
 
-incidentsRouter.patch("/:id/status", requireRole("ADMIN"), async (req, res) => {
+incidentsRouter.patch("/:id/status", requireRole("SAFETY_INSPECTOR", "CONTRACTOR"), async (req, res) => {
   try {
     const { status } = req.body || {};
     if (!status) return res.status(400).json({ message: "status is required" });
@@ -668,7 +668,7 @@ inspectionsRouter.get("/", async (req, res) => {
   }
 });
 
-inspectionsRouter.post("/", requireRole("ADMIN"), async (req, res) => {
+inspectionsRouter.post("/", requireRole("SAFETY_INSPECTOR"), async (req, res) => {
   try {
     const { site, inspectorEmail, date, type } = req.body || {};
     if (!site || !inspectorEmail || !date || !type) return res.status(400).json({ message: "site, inspectorEmail, date and type are required" });
