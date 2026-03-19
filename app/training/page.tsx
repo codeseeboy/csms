@@ -167,7 +167,8 @@ export default function TrainingPage() {
             </Card>
           )}
 
-          {!canUpload && (
+          {/* Per SRS: Worker is read-only here. Avoid showing admin upload restrictions to workers. */}
+          {!canUpload && currentUser?.role !== "Worker" && (
             <div className="rounded-xl border border-[#FFC107]/20 bg-[#FFC107]/5 p-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-[#FFC107]" />
