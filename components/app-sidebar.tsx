@@ -21,10 +21,8 @@ import { useCscms } from "@/components/cscms-provider"
 const roleNavItems = {
   Admin: [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Workers", href: "/workers", icon: Users },
     { label: "Inspections", href: "/inspections", icon: ClipboardCheck },
     { label: "Incidents", href: "/incident-reports", icon: AlertTriangle },
-    { label: "PPE", href: "/workers", icon: HardHat },
     { label: "Reports", href: "/reports", icon: FileBarChart },
     { label: "Settings", href: "/settings", icon: Settings },
   ],
