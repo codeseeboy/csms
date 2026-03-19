@@ -168,12 +168,10 @@ function DashboardContent() {
     { label: "View Reports", href: "/reports", icon: FileBarChart, color: "#6366f1", bg: "bg-[#6366f1]/10" },
   ]
   
-  // SRS: Safety Inspector should not manage workers.
+  // SRS: worker management is for Contractor only.
   const role = currentUser?.role
   const filteredQuickActions =
-    role === "Safety Inspector"
-      ? quickActions.filter((a) => a.label !== "Manage Workers")
-      : quickActions
+    role === "Contractor" ? quickActions : quickActions.filter((a) => a.label !== "Manage Workers")
 
   const recentActivity = auditLogs.slice(0, 5)
 

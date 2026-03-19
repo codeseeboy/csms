@@ -1,7 +1,6 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { AlertTriangle } from "lucide-react"
 import { useCscms } from "@/components/cscms-provider"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -44,10 +43,8 @@ function daysToExpiry(dateStr: string) {
 }
 
 export function CscmsWorkerManagement() {
-  const { workers, assignHighRiskTask, currentUser, createWorker, updateWorker, deleteWorker } = useCscms()
+  const { workers, currentUser, createWorker, updateWorker, deleteWorker } = useCscms()
   const [selectedId, setSelectedId] = useState<string>("WRK-004")
-  const [showWarning, setShowWarning] = useState(false)
-  const [note, setNote] = useState("Assignment acknowledged due to urgent timeline.")
   const [message, setMessage] = useState<string | null>(null)
 
   const [workerModalOpen, setWorkerModalOpen] = useState(false)
@@ -131,6 +128,8 @@ export function CscmsWorkerManagement() {
 
   return (
     <div className="space-y-6">
+      {message && <p className="text-sm text-muted-foreground">{message}</p>}
+
       {canManageWorkers && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div />
@@ -234,39 +233,6 @@ export function CscmsWorkerManagement() {
             <p className="text-sm text-muted-foreground">
               Certification: {selected.certStatus} {selected.certStatus === "Expiring" ? `(Expiring in ${daysToExpiry(selected.expiryDate)} days)` : ""}
             </p>
-
-            <Button
-              className="bg-[#2C3E50] text-white hover:bg-[#1f2e3d]"
-              onClick={() => {
-                if (selected.certStatus === "Expiring") {
-                  setShowWarning(true)
-                  return
-                }
-                const result = assignHighRiskTask(selected.id, "Scaffolding - Building A Floor 5", note)
-                setMessage(result.ok ? "Assignment saved." : result.message ?? "Unable to assign")
-              }}
-            >
-              Assign to High-Risk Task
-            </Button>
-
-            {showWarning && (
-              <div className="space-y-2 rounded-lg border border-[#FFC107]/20 bg-[#FFC107]/10 p-3">
-                <p className="flex items-center gap-2 text-sm font-semibold text-[#b08c00]"><AlertTriangle className="h-4 w-4" />This worker's certification expires in 7 days. Proceed with acknowledgment?</p>
-                <textarea className="min-h-16 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={note} onChange={(e) => setNote(e.target.value)} />
-                <Button
-                  className="bg-[#FFC107] text-[#1a1a2e] hover:bg-[#ffca2c]"
-                  onClick={() => {
-                    const result = assignHighRiskTask(selected.id, "Scaffolding - Building A Floor 5", note)
-                    setMessage(result.ok ? "Assignment saved with warningFlag = true." : result.message ?? "Unable to assign")
-                    setShowWarning(false)
-                  }}
-                >
-                  Proceed Anyway
-                </Button>
-              </div>
-            )}
-
-            {message && <p className="text-sm text-muted-foreground">{message}</p>}
           </CardContent>
         </Card>
       )}
