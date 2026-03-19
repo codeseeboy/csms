@@ -20,10 +20,27 @@ function statusConfig(value: string) {
 }
 
 export function CscmsDashboardPanels() {
-  const { incidents, workers, auditLogs, inspections } = useCscms()
+  const { incidents, workers, auditLogs, inspections, currentUser } = useCscms()
+  const role = currentUser?.role
+  const isContractor = role === "Contractor"
+
+  const dummyIncidents = [
+    { id: "INC-DEMO-1", title: "Fall risk near scaffold", severity: "High", location: "Site B - Floor 3", status: "Open" },
+    { id: "INC-DEMO-2", title: "Minor slip near parking lot", severity: "Medium", location: "Site B - Parking Lot", status: "Under Review" },
+  ]
+
+  const dummyUpcomingInspections = [
+    { id: "INSP-DEMO-1", site: "Site B", inspectorName: "Ravi Kumar", type: "Electrical Safety", date: "2026-03-20", status: "Scheduled" },
+    { id: "INSP-DEMO-2", site: "Site A", inspectorName: "Ravi Kumar", type: "Fire Safety", date: "2026-03-22", status: "Scheduled" },
+    { id: "INSP-DEMO-3", site: "Site C", inspectorName: "Ravi Kumar", type: "Mechanical Safety", date: "2026-03-25", status: "Scheduled" },
+  ]
+
+  const incidentsToShow = isContractor && incidents.length === 0 ? dummyIncidents : incidents
+  const inspectionsToShow =
+    isContractor && inspections.filter((i) => i.status === "Scheduled").length === 0 ? dummyUpcomingInspections : inspections
 
   const expiringWorkers = workers.filter((w) => w.certStatus === "Expiring").slice(0, 4)
-  const upcomingInspections = inspections.filter((i) => i.status === "Scheduled").slice(0, 3)
+  const upcomingInspections = inspectionsToShow.filter((i) => i.status === "Scheduled").slice(0, 3)
 
   return (
     <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
@@ -36,13 +53,15 @@ export function CscmsDashboardPanels() {
             </div>
             <CardTitle className="text-sm font-semibold text-card-foreground">Recent Incidents</CardTitle>
           </div>
-          <Link href="/incident-reports" className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
-            View all <ChevronRight className="h-3 w-3" />
-          </Link>
+          {role !== "Contractor" && (
+            <Link href="/incident-reports" className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+              View all <ChevronRight className="h-3 w-3" />
+            </Link>
+          )}
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {incidents.slice(0, 5).map((incident) => {
+            {incidentsToShow.slice(0, 5).map((incident) => {
               const sev = severityConfig(incident.severity)
               const stat = statusConfig(incident.status)
               return (
@@ -69,7 +88,7 @@ export function CscmsDashboardPanels() {
                 </div>
               )
             })}
-            {incidents.length === 0 && (
+            {incidentsToShow.length === 0 && (
               <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                 No incidents reported yet
               </div>
@@ -132,9 +151,11 @@ export function CscmsDashboardPanels() {
               </div>
               <CardTitle className="text-sm font-semibold text-card-foreground">Upcoming Inspections</CardTitle>
             </div>
-            <Link href="/inspections" className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
-              View all <ChevronRight className="h-3 w-3" />
-            </Link>
+            {role !== "Contractor" && (
+              <Link href="/inspections" className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+                View all <ChevronRight className="h-3 w-3" />
+              </Link>
+            )}
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
