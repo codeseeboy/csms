@@ -32,7 +32,6 @@ const roleNavItems = {
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Inspections", href: "/inspections", icon: ClipboardCheck },
     { label: "Incidents", href: "/incident-reports", icon: AlertTriangle },
-    { label: "Workers", href: "/workers", icon: Users },
   ],
   Contractor: [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
