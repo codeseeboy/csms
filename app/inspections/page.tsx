@@ -37,14 +37,44 @@ export default function InspectionsPage() {
   const passed = checklistItems.filter((i) => i.compliant).length
   const failed = checklistItems.filter((i) => !i.compliant).length
 
-  // This page is Safety Inspector only (AuthGuard). Keep checklist rendering scoped to the logged-in inspector.
-  const myTasks = useMemo(() => inspections.filter((item) => item.inspectorEmail === currentUser?.email), [inspections, currentUser])
+  const myTasks = useMemo(() => {
+    if (currentUser?.role !== "Safety Inspector") {
+      return inspections
+    }
+    return inspections.filter((item) => item.inspectorEmail === currentUser.email)
+  }, [inspections, currentUser])
 
   return (
-    <AuthGuard allowedRoles={["Safety Inspector"]}>
+    <AuthGuard allowedRoles={["Safety Inspector", "Government Authority"]}>
       <DashboardLayout>
         <TopNavbar title="Inspections" />
         <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
+          {currentUser?.role === "Safety Inspector" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Schedule New Inspection</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                  <input className="h-10 rounded-lg border border-input bg-background px-3 text-sm" value={site} onChange={(e) => setSite(e.target.value)} />
+                  <input className="h-10 rounded-lg border border-input bg-background px-3 text-sm" value={inspectorEmail} onChange={(e) => setInspectorEmail(e.target.value)} />
+                  <input type="date" className="h-10 rounded-lg border border-input bg-background px-3 text-sm" value={date} onChange={(e) => setDate(e.target.value)} />
+                  <input className="h-10 rounded-lg border border-input bg-background px-3 text-sm" value={type} onChange={(e) => setType(e.target.value)} />
+                </div>
+                <Button
+                  className="mt-3 bg-[#FFC107] text-[#1a1a2e] hover:bg-[#ffca2c]"
+                  onClick={async () => {
+                    const result = await scheduleInspection(site, inspectorEmail, date, type)
+                    setFormMsg(result.ok ? "Inspection scheduled successfully." : result.message ?? "Unable to schedule")
+                  }}
+                >
+                  Create Inspection
+                </Button>
+                {formMsg && <p className="mt-2 text-sm text-muted-foreground">{formMsg}</p>}
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>{currentUser?.role === "Safety Inspector" ? "My Tasks" : "Inspection Queue"}</CardTitle>

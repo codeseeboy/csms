@@ -151,6 +151,14 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [workers, incidents, inspections, complianceRecords, auditLogs, notifications, assignments, currentUser, sessionToken])
 
+  // SRS: Government Authority should never retain/view full audit logs.
+  // If the active user is not Admin, clear auditLogs to avoid stale localStorage state.
+  useEffect(() => {
+    if (currentUser?.role !== "Admin") {
+      setAuditLogs([])
+    }
+  }, [currentUser?.role])
+
   const callApi = async (path: string, options: RequestInit = {}, tokenOverride?: string) => {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

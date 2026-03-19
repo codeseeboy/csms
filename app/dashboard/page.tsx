@@ -35,10 +35,7 @@ function DashboardContent() {
 
   useEffect(() => { setMounted(true) }, [])
 
-  const roleRaw = currentUser?.role ? String(currentUser.role) : ""
-  const roleLc = roleRaw.toLowerCase()
-
-  const isWorker = roleLc === "worker"
+  const isWorker = currentUser?.role === "Worker"
   const myWorker =
     isWorker && currentUser
       ? workers.find((w) => w.userId === currentUser.id) ?? (workers.length === 1 ? workers[0] : undefined)
@@ -113,13 +110,15 @@ function DashboardContent() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 pb-2">
                 <Users className="h-4 w-4 text-[#2C3E50]" />
-                <h3 className="text-sm font-semibold">Work Status</h3>
+                <h3 className="text-sm font-semibold">My Profile</h3>
               </div>
               {myWorker ? (
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm font-semibold">{myWorker.name}</p>
                     <p className="text-xs text-muted-foreground">{myWorker.id}</p>
+                    <p className="text-xs text-muted-foreground">Role: {myWorker.role}</p>
+                    <p className="text-xs text-muted-foreground">Site: {myWorker.site || "—"}</p>
                   </div>
 
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -171,14 +170,16 @@ function DashboardContent() {
     { label: "View Reports", href: "/reports", icon: FileBarChart, color: "#6366f1", bg: "bg-[#6366f1]/10" },
   ]
   
-  // SRS: worker/inspection/incident actions are role-scoped. Normalize role string defensively.
-  const role = roleLc
+  // SRS: worker management is for Contractor only.
+  const role = currentUser?.role
   const filteredQuickActions =
-    role === "contractor"
-      ? quickActions
-      : role === "admin"
+    role === "Contractor"
+      ? quickActions.filter((a) => a.label !== "Schedule Inspection" && a.label !== "Report Incident")
+      : role === "Government Authority"
         ? quickActions.filter((a) => a.label !== "Schedule Inspection" && a.label !== "Report Incident" && a.label !== "Manage Workers")
-        : quickActions.filter((a) => a.label !== "Manage Workers" && a.label !== "Schedule Inspection" && a.label !== "Report Incident")
+      : role === "Admin"
+        ? quickActions.filter((a) => a.label !== "Schedule Inspection" && a.label !== "Report Incident" && a.label !== "Manage Workers")
+        : quickActions.filter((a) => a.label !== "Manage Workers")
 
   const recentActivity = auditLogs.slice(0, 5)
 
@@ -194,10 +195,12 @@ function DashboardContent() {
               {getGreeting()}, {currentUser?.name?.split(" ")[0] ?? "there"}
             </h1>
             <p className="mt-2 line-clamp-2 text-sm text-white/60">
-              {openIncidents > 0
-                ? `You have ${openIncidents} open incident${openIncidents !== 1 ? "s" : ""} and ${activeInspections} scheduled inspection${activeInspections !== 1 ? "s" : ""} to review.`
-                : `All clear — ${activeInspections} inspection${activeInspections !== 1 ? "s" : ""} scheduled. Compliance at ${complianceRate}%.`
-              }
+                  {role === "Contractor"
+                    ? `Compliance at ${complianceRate}%.`
+                    : openIncidents > 0
+                      ? `You have ${openIncidents} open incident${openIncidents !== 1 ? "s" : ""} and ${activeInspections} scheduled inspection${activeInspections !== 1 ? "s" : ""} to review.`
+                      : `All clear — ${activeInspections} inspection${activeInspections !== 1 ? "s" : ""} scheduled. Compliance at ${complianceRate}%.`
+                  }
             </p>
           </div>
           <div className="flex flex-wrap gap-4 sm:gap-6">
@@ -254,40 +257,42 @@ function DashboardContent() {
           <CscmsDashboardPanels />
         </div>
 
-        {/* Activity Timeline */}
-        <Card className="border-border bg-card">
-          <div className="flex items-center gap-2 border-b border-border p-5">
-            <Clock className="h-5 w-5 text-[#FFC107]" />
-            <h3 className="text-sm font-semibold text-card-foreground">Recent Activity</h3>
-            <span className="ml-auto rounded-full bg-[#FFC107]/10 px-2 py-0.5 text-xs font-medium text-[#FFC107]">
-              {recentActivity.length}
-            </span>
-          </div>
-          <CardContent className="p-0">
-            <div className="divide-y divide-border">
-              {recentActivity.length === 0 && (
-                <div className="p-5 text-center text-sm text-muted-foreground">No recent activity</div>
-              )}
-              {recentActivity.map((log, i) => (
-                <div key={log.id} className="flex gap-3 p-4 transition-colors hover:bg-muted/30">
-                  <div className="relative flex flex-col items-center">
-                    <div className={`h-2.5 w-2.5 rounded-full ${i === 0 ? "bg-[#FFC107]" : "bg-muted-foreground/30"}`} />
-                    {i < recentActivity.length - 1 && (
-                      <div className="mt-1 h-full w-px bg-border" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1 pb-2">
-                    <p className="text-xs font-semibold text-foreground">{log.action.replace(/_/g, " ")}</p>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{log.details}</p>
-                    <p className="mt-1 text-[10px] text-muted-foreground/60">
-                      {new Date(log.timestamp).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                    </p>
-                  </div>
-                </div>
-              ))}
+        {/* Activity Timeline (Admin only) */}
+        {currentUser?.role === "Admin" && (
+          <Card className="border-border bg-card">
+            <div className="flex items-center gap-2 border-b border-border p-5">
+              <Clock className="h-5 w-5 text-[#FFC107]" />
+              <h3 className="text-sm font-semibold text-card-foreground">Recent Activity</h3>
+              <span className="ml-auto rounded-full bg-[#FFC107]/10 px-2 py-0.5 text-xs font-medium text-[#FFC107]">
+                {recentActivity.length}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <CardContent className="p-0">
+              <div className="divide-y divide-border">
+                {recentActivity.length === 0 && (
+                  <div className="p-5 text-center text-sm text-muted-foreground">No recent activity</div>
+                )}
+                {recentActivity.map((log, i) => (
+                  <div key={log.id} className="flex gap-3 p-4 transition-colors hover:bg-muted/30">
+                    <div className="relative flex flex-col items-center">
+                      <div className={`h-2.5 w-2.5 rounded-full ${i === 0 ? "bg-[#FFC107]" : "bg-muted-foreground/30"}`} />
+                      {i < recentActivity.length - 1 && (
+                        <div className="mt-1 h-full w-px bg-border" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1 pb-2">
+                      <p className="text-xs font-semibold text-foreground">{log.action.replace(/_/g, " ")}</p>
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">{log.details}</p>
+                      <p className="mt-1 text-[10px] text-muted-foreground/60">
+                        {new Date(log.timestamp).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Notification Banner */}

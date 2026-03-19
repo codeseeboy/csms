@@ -9,7 +9,7 @@ import { useCscms } from "@/components/cscms-provider"
 import { Button } from "@/components/ui/button"
 
 export default function ReportsPage() {
-  const { complianceRecords, auditLogs, sessionToken } = useCscms()
+  const { complianceRecords, auditLogs, sessionToken, currentUser } = useCscms()
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000/api"
 
@@ -47,40 +47,42 @@ export default function ReportsPage() {
       <DashboardLayout>
         <TopNavbar title="Compliance Reports" />
         <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Export Reports</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
-              <div className="flex w-full flex-col gap-2 md:flex-row md:items-center md:gap-3">
-                <div className="flex flex-1 flex-col gap-1">
-                  <label className="text-xs text-muted-foreground">From</label>
-                  <input
-                    type="date"
-                    className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                  />
+          {currentUser?.role === "Admin" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Export Reports</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-wrap gap-3">
+                <div className="flex w-full flex-col gap-2 md:flex-row md:items-center md:gap-3">
+                  <div className="flex flex-1 flex-col gap-1">
+                    <label className="text-xs text-muted-foreground">From</label>
+                    <input
+                      type="date"
+                      className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1">
+                    <label className="text-xs text-muted-foreground">To</label>
+                    <input
+                      type="date"
+                      className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="flex flex-1 flex-col gap-1">
-                  <label className="text-xs text-muted-foreground">To</label>
-                  <input
-                    type="date"
-                    className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                  />
-                </div>
-              </div>
 
-              <Button className="bg-[#2C3E50] text-white hover:bg-[#1f2e3d]" onClick={() => void downloadReport("pdf")}>
-                Download PDF
-              </Button>
-              <Button className="bg-[#FFC107] text-[#1a1a2e] hover:bg-[#ffca2c]" onClick={() => void downloadReport("excel")}>
-                Download Excel
-              </Button>
-            </CardContent>
-          </Card>
+                <Button className="bg-[#2C3E50] text-white hover:bg-[#1f2e3d]" onClick={() => void downloadReport("pdf")}>
+                  Download PDF
+                </Button>
+                <Button className="bg-[#FFC107] text-[#1a1a2e] hover:bg-[#ffca2c]" onClick={() => void downloadReport("excel")}>
+                  Download Excel
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
@@ -104,20 +106,22 @@ export default function ReportsPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Audit Logs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {auditLogs.slice(0, 12).map((log) => (
-                  <div key={log.id} className="rounded-lg border border-border p-2 text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">{log.action}</span> | {log.module} | {log.userId}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {currentUser?.role === "Admin" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Audit Logs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {auditLogs.slice(0, 12).map((log) => (
+                    <div key={log.id} className="rounded-lg border border-border p-2 text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">{log.action}</span> | {log.module} | {log.userId}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </DashboardLayout>
     </AuthGuard>
