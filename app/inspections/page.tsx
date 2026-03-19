@@ -45,7 +45,7 @@ export default function InspectionsPage() {
   }, [inspections, currentUser])
 
   return (
-    <AuthGuard allowedRoles={["Admin", "Safety Inspector"]}>
+    <AuthGuard allowedRoles={["Safety Inspector"]}>
       <DashboardLayout>
         <TopNavbar title="Inspections" />
         <div className="space-y-4 overflow-x-auto p-4 sm:space-y-6 sm:p-6">
