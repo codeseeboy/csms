@@ -51,7 +51,22 @@ export default function IncidentReportsPage() {
   const onFileChange = (file: File | null) => {
     if (!file) { setEvidenceFile(null); return }
     if (file.size > 5 * 1024 * 1024) { setFeedback({ text: "File size exceeds 5 MB limit.", ok: false }); return }
-    if (!["image/jpeg", "image/png", "application/pdf"].includes(file.type)) { setFeedback({ text: "Invalid file type. Only PDF, JPG, and PNG are allowed.", ok: false }); return }
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "application/pdf",
+      "video/mp4",
+      "video/webm",
+      "video/quicktime",
+      "video/x-matroska",
+      "video/ogg",
+    ]
+    const allowedByMime = allowedTypes.includes(file.type)
+    const allowedByExt = /\.(mp4|webm|mov|mkv|ogg|pdf|jpe?g|png)$/i.test(file.name)
+    if (!allowedByMime && !allowedByExt) {
+      setFeedback({ text: "Invalid file type. Allowed: PDF, JPG, PNG, MP4, WEBM, MOV, MKV, OGG (max 5MB).", ok: false })
+      return
+    }
     setEvidenceFile(file)
     setFeedback({ text: `Evidence attached: ${file.name}`, ok: true })
   }
@@ -119,12 +134,17 @@ export default function IncidentReportsPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Evidence (PDF, JPG, PNG — max 5MB)</label>
+                  <label className="text-xs font-medium text-muted-foreground">Evidence (PDF/JPG/PNG/Video — max 5MB)</label>
                   <div className="flex items-center gap-3">
                     <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40">
                       <Upload className="h-4 w-4" />
                       {evidenceFile ? evidenceFile.name : "Choose file"}
-                      <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => onFileChange(e.target.files?.[0] ?? null)} />
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png,.mp4,.webm,.mov,.mkv,.ogg"
+                        onChange={(e) => onFileChange(e.target.files?.[0] ?? null)}
+                      />
                     </label>
                   </div>
                 </div>

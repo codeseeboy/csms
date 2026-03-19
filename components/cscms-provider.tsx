@@ -60,6 +60,12 @@ type CscmsContextValue = {
   ) => Promise<LoginResult>
   assignHighRiskTask: (workerId: string, task: string, note: string) => LoginResult
   uploadTrainingFile: (workerId: string, file: File) => LoginResult
+  createWorker: (payload: { name: string; role: string; contact: string; assignedPPE: string; expiryDate: string }) => LoginResult
+  updateWorker: (
+    workerId: string,
+    payload: { name: string; role: string; contact: string; assignedPPE: string; expiryDate: string },
+  ) => LoginResult
+  deleteWorker: (workerId: string) => LoginResult
   recordUnauthorizedAccess: (module: string) => void
   openIncidents: number
   activeInspections: number
@@ -582,6 +588,99 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const computeCertStatus = (expiryDate: string) => {
+    if (!expiryDate) return "Valid" as const
+    const exp = new Date(expiryDate)
+    if (Number.isNaN(exp.getTime())) return "Valid" as const
+    const now = new Date()
+    if (exp.getTime() < now.getTime()) return "Expired" as const
+    const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+    if (exp.getTime() <= in30.getTime()) return "Expiring" as const
+    return "Valid" as const
+  }
+
+  const refreshWorkers = async () => {
+    const workersRes = await callApi("/workers", { method: "GET" })
+    if (workersRes.response.ok && Array.isArray(workersRes.data.items)) {
+      setWorkers(workersRes.data.items as Worker[])
+    }
+  }
+
+  const createWorker = async (payload: { name: string; role: string; contact: string; assignedPPE: string; expiryDate: string }): Promise<LoginResult> => {
+    if (!currentUser || !sessionToken) return { ok: false, message: "Please login first" }
+    try {
+      const certStatus = computeCertStatus(payload.expiryDate)
+      const { response, data } = await callApi("/workers", {
+        method: "POST",
+        body: JSON.stringify({
+          name: payload.name,
+          role: payload.role,
+          contact: payload.contact,
+          certStatus,
+          trainingStatus: "In Progress",
+          assignedPPE: payload.assignedPPE,
+          expiryDate: payload.expiryDate || null,
+        }),
+      })
+
+      if (!response.ok) {
+        return { ok: false, message: (data as Record<string, unknown>)?.message ?? "Unable to create worker" }
+      }
+
+      await refreshWorkers()
+      await syncAuditAndNotifications()
+      return { ok: true }
+    } catch {
+      return { ok: false, message: "Unable to connect to backend" }
+    }
+  }
+
+  const updateWorker = async (
+    workerId: string,
+    payload: { name: string; role: string; contact: string; assignedPPE: string; expiryDate: string },
+  ): Promise<LoginResult> => {
+    if (!currentUser || !sessionToken) return { ok: false, message: "Please login first" }
+    try {
+      const certStatus = computeCertStatus(payload.expiryDate)
+      const { response, data } = await callApi(`/workers/${workerId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: payload.name,
+          role: payload.role,
+          contact: payload.contact,
+          certStatus,
+          trainingStatus: "In Progress",
+          assignedPPE: payload.assignedPPE,
+          expiryDate: payload.expiryDate || null,
+        }),
+      })
+
+      if (!response.ok) {
+        return { ok: false, message: (data as Record<string, unknown>)?.message ?? "Unable to update worker" }
+      }
+
+      await refreshWorkers()
+      await syncAuditAndNotifications()
+      return { ok: true }
+    } catch {
+      return { ok: false, message: "Unable to connect to backend" }
+    }
+  }
+
+  const deleteWorker = async (workerId: string): Promise<LoginResult> => {
+    if (!currentUser || !sessionToken) return { ok: false, message: "Please login first" }
+    try {
+      const { response, data } = await callApi(`/workers/${workerId}`, { method: "DELETE" })
+      if (!response.ok) return { ok: false, message: (data as Record<string, unknown>)?.message ?? "Unable to delete worker" }
+
+      await refreshWorkers()
+      await syncAuditAndNotifications()
+      return { ok: true }
+    } catch {
+      return { ok: false, message: "Unable to connect to backend" }
+    }
+  }
+
   const openIncidents = incidents.filter((item) => item.status === "Open").length
   const activeInspections = inspections.filter((item) => item.status === "Scheduled").length
   const completedInspections = inspections.filter((item) => item.status === "Completed")
@@ -613,6 +712,9 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
       completeInspection,
       assignHighRiskTask,
       uploadTrainingFile,
+      createWorker,
+      updateWorker,
+      deleteWorker,
       recordUnauthorizedAccess,
       openIncidents,
       activeInspections,
@@ -630,6 +732,9 @@ export function CscmsProvider({ children }: { children: React.ReactNode }) {
       assignments,
       currentUser,
       sessionToken,
+      createWorker,
+      updateWorker,
+      deleteWorker,
       openIncidents,
       activeInspections,
       complianceRate,
